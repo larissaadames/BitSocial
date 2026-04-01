@@ -1,0 +1,169 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #121212;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Formas de fundo */
+.bg-shape {
+    position: absolute;
+    z-index: -1;
+}
+
+.shape-1 {
+    width: 200px;
+    height: 400px;
+    background: linear-gradient(to bottom, #d63384, #a020f0);
+    left: 2%;
+    top: 15%;
+}
+
+.shape-2 {
+    width: 100px;
+    height: 300px;
+    background: #7d2ae8;
+    right: 2%;
+    bottom: 5%;
+}
+
+.shape-3 {
+    width: 150px;
+    height: 50px;
+    background: #7d2ae8;
+    top: 0;
+    left: 45%;
+}
+
+/* Card de Login */
+.login-container {
+    background-color: rgba(30, 30, 30, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 850px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.title {
+    color: white;
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+/* Lado da Imagem */
+.illustration {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.illustration img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Lado do Formulário */
+.login-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: #b0b0b0;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #d1d1d1;
+    font-size: 1rem;
+    outline: none;
+}
+
+.forgot-password {
+    color: #b0b0b0;
+    text-decoration: none;
+    font-size: 0.8rem;
+    margin-bottom: 25px;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: white;
+}
+
+.btn {
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #6c28f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-secondary {
+    background-color: #6c28f0;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    background-color: #5a1ecf;
+}
+
+.separator {
+    color: white;
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1rem;
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+    }
+    .title {
+        font-size: 2rem;
+    }
+}
