@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>Login</title>
-</head>
-<body>
+  </head>
+  <body>
     <div class="bg-shape shape-1"></div>
     <div class="bg-shape shape-2"></div>
     <div class="bg-shape shape-3"></div>
@@ -19,30 +19,40 @@
                 <img src="/public/img/bitCafé.png" alt="Ilustração da Bit">
             </div>
 
-            <form class="login-form">
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email">
-                </div>
+        <form class="login-form">
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" />
+          </div>
 
-                <div class="input-group">
-                    <label for="password">Senha</label>
-                    <input type="password" id="password" name="password">
-                </div>
+          <div class="input-group">
+            <label for="password">Senha</label>
 
-                <a href="#" class="forgot-password">Esqueceu a senha?</a>
+            <div class="password-field">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                title="Mínimo 8 caracteres, com letra maiúscula, minúscula, número e símbolo."
+              />
 
-                <button type="submit" class="btn btn-primary">
-                    Log in <span>&rarr;</span>
-                </button>
+              <button type="button" onclick="togglePassword()">👁</button>
+            </div>
+          </div>
 
-                <p class="separator">ou</p>
+          <a href="#" class="forgot-password">Esqueceu a senha?</a>
 
-                <button type="button" class="btn btn-secondary">
-                    Criar conta
-                </button>
-            </form>
-        </div>
+          <button type="submit" class="btn btn-primary">
+            Log in <span>&rarr;</span>
+          </button>
+
+          <p class="separator">ou</p>
+
+          <button type="button" class="btn btn-secondary">Criar conta</button>
+        </form>
+      </div>
     </main>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
