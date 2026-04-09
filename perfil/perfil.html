@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social - Perfil</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <span class="logo-text">Social</span>
+                <div class="logo-icon"></div>
+            </div>
+            
+            <div class="search-section">
+                <input type="text" placeholder="Pesquisar" class="search-bar">
+            </div>
+
+            <div class="user-section">
+                <div class="header-user-avatar"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="profile-grid">
+            
+            <aside class="sidebar">
+                <div class="sticky-wrapper">
+                    <div class="profile-avatar-big" id="avatar-display">
+                        <div class="avatar-overlay">Alterar Foto</div>
+                    </div>
+                    
+                    <input type="file" id="profile-upload" accept="image/*" style="display: none;">
+                    
+                    <div class="user-details">
+                        <h1 class="display-name">Nome Sobrenome</h1>
+                        <span class="user-handle">@username</span>
+                    </div>
+
+                    <button class="btn-edit" id="btn-edit-mode">Editar Perfil</button>
+                </div>
+            </aside>
+
+            <section class="feed">
+                <article class="post-card"></article>
+                <article class="post-card"></article>
+                <article class="post-card"></article>
+                <article class="post-card"></article>
+                <article class="post-card"></article>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
