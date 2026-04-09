@@ -1,3 +1,5 @@
+// mascara telefone
+
 const telefone = document.getElementById("telefone");
 
 telefone.addEventListener("input", function (e) {
@@ -23,3 +25,55 @@ form.addEventListener("submit", function (e) {
     e.preventDefault();
   }
 });
+
+//
+
+// data de nascimento
+
+const dataNascimentoInput = document.getElementById('dt-nasc');
+
+const hoje = new Date();
+
+const dataMinima16 = new Date();
+dataMinima16.setFullYear(hoje.getFullYear() - 16);
+
+const formatarData = (data) => {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+};
+
+dataNascimentoInput.max = formatarData(dataMinima16);
+
+const usuarioInput = document.getElementById('usuario');
+
+// 
+
+// mascara "@" usuario
+
+usuarioInput.addEventListener('input', function() {
+    let valor = this.value;
+
+    if (valor.length > 0 && !valor.startsWith('@')) {
+        this.value = '@' + valor;
+    }
+
+    if (valor.startsWith('@@')) {
+        this.value = '@' + valor.replace(/^@+/, '');
+    }
+});
+
+usuarioInput.addEventListener('focus', function() {
+    if (this.value === '') {
+        this.value = '@';
+    }
+});
+
+usuarioInput.addEventListener('blur', function() {
+    if (this.value === '@') {
+        this.value = '';
+    }
+});
+
+

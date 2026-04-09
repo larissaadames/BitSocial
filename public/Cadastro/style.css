@@ -1,0 +1,203 @@
+/* 1. Importação da Fonte e Variáveis Globais */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+:root {
+    --bg-color: #0d0d0d;
+    --card-bg: #1a1a1a;
+    --input-bg: #d9d9d9;
+    --accent-purple: #7b2ff7;
+    --text-white: #ffffff;
+    --text-label: #a0a0a0;
+}
+
+/* 2. Reset e Configurações de Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-white);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* 3. Elementos Decorativos de Fundo (Os quadrados roxos da imagem) */
+body::before, body::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+}
+
+body::before {
+    width: 300px;
+    height: 400px;
+    background-color: var(--accent-purple);
+    left: -80px;
+    top: 20%;
+    opacity: 0.6;
+}
+
+body::after {
+    width: 150px;
+    height: 600px;
+    background-color: #9d39ff;
+    right: 0;
+    bottom: 0;
+    opacity: 0.5;
+}
+
+/* 4. Estrutura do Card Principal */
+.registration-card {
+    display: flex;
+    background-color: var(--card-bg);
+    width: 95%;
+    max-width: 1050px;
+    padding: 60px;
+    border-radius: 28px;
+    gap: 50px;
+    align-items: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+}
+
+/* 5. Lado das Ilustrações */
+.illustrations-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+.img-character {
+    width: 100%;
+    max-width: 280px;
+    filter: drop-shadow(0 0 20px rgba(123, 47, 247, 0.4));
+}
+
+.img-bulb {
+    width: 130px;
+}
+
+/* 6. Lado do Formulário */
+.form-side {
+    flex: 1.4;
+}
+
+h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* 7. Estilização dos Inputs */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+label {
+    font-size: 0.8rem;
+    color: var(--text-label);
+    font-weight: 600;
+    text-transform: none;
+}
+
+input {
+    background-color: var(--input-bg);
+    border: none;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #1a1a1a; /* Texto dentro do input escuro para contraste */
+    outline: none;
+    transition: all 0.2s;
+}
+
+input:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(123, 47, 247, 0.3);
+}
+
+/* 8. Botão e Links */
+.btn-submit {
+    width: 100%;
+    background-color: var(--accent-purple);
+    color: white;
+    border: none;
+    padding: 18px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 25px;
+    transition: 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #6a24d4;
+    transform: translateY(-2px);
+}
+
+.login-link {
+    text-align: right;
+    margin-top: 15px;
+}
+
+.login-link a {
+    color: var(--text-label);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.login-link a:hover {
+    color: var(--text-white);
+    text-decoration: underline;
+}
+
+/* 9. Responsividade (Mobile) */
+@media (max-width: 900px) {
+    .registration-card {
+        flex-direction: column;
+        padding: 40px 20px;
+        margin: 20px;
+    }
+
+    .form-side {
+        width: 100%;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: span 1;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        text-align: center;
+    }
+}
