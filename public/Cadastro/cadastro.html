@@ -6,11 +6,21 @@
     <title>Cadastro</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body> 
+<body>
+    <div class="bg-geo">
+        <div class="b b1"></div>
+        <div class="b b2"></div>
+        <div class="b b3"></div>
+        <div class="b b4"></div>
+        <div class="b b5"></div>
+        <div class="b b6"></div>
+        <div class="b b7"></div>
+        <div class="b b8"></div>
+        <div class="b b9"></div>
+    </div>
     <div class="registration-card">
       <div class="illustrations-side">
           <img src="../img/bitLampada.png" alt="bit" class="img-character">
-          <img src="lampada.png" alt="Lâmpada" class="img-bulb">
       </div>
 
       <div class="form-side">
@@ -58,7 +68,7 @@
 
                   <div class="input-group">
                       <label for="dt-nasc">Data de Nascimento</label>
-                      <input type="date" id="dt-nasc" min="required />
+                      <input type="date" id="dt-nasc" min="required"/>
                   </div>
 
                   <div class="input-group">
@@ -86,33 +96,39 @@
                       />
                   </div>
 
-                  <div class="input-group full-width">
-                      <label for="senha">Senha</label>
-                      <input
-                        type="password"
-                        id="senha"
-                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                        title="Mínimo 8 caracteres, com letra maiúscula, minúscula, número e símbolo."
-                        required
-                        placeholder="••••••••"
-                      />
-                  </div>
+                    <div class="input-group full-width">
+                        <label for="senha">Senha</label>
+                        <div class="password-field">
+                            <input
+                                type="password"
+                                id="senha"
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                                title="Mínimo 8 caracteres, com letra maiúscula, minúscula, número e símbolo."
+                                required
+                                placeholder="••••••••"
+                            />
+                            <button type="button" onclick="togglePassword('senha', this)">👁</button>
+                        </div>
+                    </div>
 
-                  <div class="input-group full-width">
-                      <label for="senha-confirmar">Confirmar senha</label>
-                      <input
-                        type="password"
-                        id="senha-confirmar"
-                        required
-                        placeholder="••••••••"
-                      />
-                  </div>
+                    <div class="input-group full-width">
+                        <label for="senha-confirmar">Confirmar senha</label>
+                        <div class="password-field">
+                            <input
+                                type="password"
+                                id="senha-confirmar"
+                                required
+                                placeholder="••••••••"
+                            />
+                            <button type="button" onclick="togglePassword('senha-confirmar', this)">👁</button>
+                        </div>
+                    </div>
               </div>
 
               <button type="submit" class="btn-submit">Criar Conta</button>
               
               <div class="login-link">
-                  <a href="#">➔ Já possui login?</a>
+                  <a href="../Login/login.html">➔ Já possui uma conta?</a>
               </div>
           </form>
       </div>

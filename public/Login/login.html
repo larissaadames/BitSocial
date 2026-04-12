@@ -7,9 +7,20 @@
     <title>Login</title>
   </head>
   <body>
-    <div class="bg-shape shape-1"></div>
+    <!-- <div class="bg-shape shape-1"></div>
     <div class="bg-shape shape-2"></div>
-    <div class="bg-shape shape-3"></div>
+    <div class="bg-shape shape-3"></div> -->
+    <div class="bg-geo">
+        <div class="b b1"></div>
+        <div class="b b2"></div>
+        <div class="b b3"></div>
+        <div class="b b4"></div>
+        <div class="b b5"></div>
+        <div class="b b6"></div>
+        <div class="b b7"></div>
+        <div class="b b8"></div>
+        <div class="b b9"></div>
+    </div>
 
     <main class="login-container">
         <h1 class="title">Login</h1>
@@ -22,7 +33,7 @@
         <form class="login-form">
           <div class="input-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" />
+            <input type="email" id="email" name="email" placeholder="exemplo@email.com"/>
           </div>
 
           <div class="input-group">
@@ -35,6 +46,7 @@
                 name="password"
                 pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
                 title="Mínimo 8 caracteres, com letra maiúscula, minúscula, número e símbolo."
+                placeholder="••••••••"
               />
 
               <button type="button" onclick="togglePassword()">👁</button>
@@ -43,13 +55,15 @@
 
           <a href="#" class="forgot-password">Esqueceu a senha?</a>
 
-          <button type="submit" class="btn btn-primary">
-            Log in <span>&rarr;</span>
-          </button>
+        <button type="submit" class="btn btn-primary">
+            Log in <img src="../img/pixelarrow.png" alt="seta" class="btn-arrow">
+        </button>
 
           <p class="separator">ou</p>
 
-          <button type="button" class="btn btn-secondary">Criar conta</button>
+          <a href="../Cadastro/cadastro.html">
+            <button type="button" class="btn btn-secondary">Criar conta</button>
+          </a>  
         </form>
       </div>
     </main>

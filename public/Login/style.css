@@ -1,21 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Orbitron", sans-serif;
 }
 
 body {
-  background-color: #121212;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
+    background: radial-gradient(ellipse at 80% 60%, #1e1230 0%, #111 55%, #0a0a0a 100%);
+    color: var(--text-white);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
 }
 
-/* Formas de fundo */
+@keyframes glow {
+
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50%       { filter: brightness(1.6) saturate(1.4); }
+}
+
+.bg-geo {
+
+    position: fixed;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    transition: transform 0.12s ease-out;
+
+}
+
+.bg-geo .b { position: absolute; border-radius: 2px; }
+.b1  { left:4%;  top:24%; width:7%;  height:30%; background:#d946ef; animation: glow 3.5s ease-in-out infinite; }
+.b2  { left:11%; top:54%; width:21%; height:24%; background:#cc3de8; animation: glow 3.5s ease-in-out 0.5s infinite; }
+.b3  { left:4%;  top:78%; width:7%;  height:16%; background:#d946ef; animation: glow 3s ease-in-out 0.2s infinite; }
+.b4  { left:4%;  top:91%; width:55%; height:9%;  background:#d946ef; animation: glow 3s ease-in-out 0.1s infinite; }
+.b5  { left:49%; top:5%;  width:8%;  height:13%; background:#b026d3; animation: glow 2.8s ease-in-out 1s infinite; }
+.b6  { left:36%; top:17%; width:21%; height:14%; background:#b026d3; animation: glow 2.8s ease-in-out 1s infinite; }
+.b7  { left:57%; top:31%; width:10%; height:17%; background:#9333ea; animation: glow 3.8s ease-in-out 1.5s infinite; }
+.b8  { left:67%; top:14.05%; width:29%; height:17.1%; background:#8b2be2; animation: glow 3.5s ease-in-out 0.8s infinite; }
+.b9  { left:90%; top:31%; width:10%; height:66%; background:#7c22d4; animation: glow 4s ease-in-out 0.3s infinite; }
+
+/* Formas de fundo
 .bg-shape {
   position: absolute;
   z-index: -1;
@@ -43,11 +77,11 @@ body {
   background: #7d2ae8;
   top: 0;
   left: 45%;
-}
+} */
 
 /* Card de Login */
 .login-container {
-  background-color: rgba(30, 30, 30, 0.9);
+  background-color: #1e1e1ee6;
   backdrop-filter: blur(10px);
   padding: 40px;
   border-radius: 24px;
@@ -57,12 +91,13 @@ body {
 }
 
 .title {
-  color: white;
-  text-align: center;
-  font-size: 3rem;
-  margin-bottom: 40px;
-  font-weight: bold;
-}
+    /* font-family: "Orbitron", sans-serif; */
+    color: white;
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    font-weight: bold;
+    }
 
 .content {
   display: flex;
@@ -102,13 +137,20 @@ body {
 }
 
 .input-group input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background-color: #d1d1d1;
-  font-size: 1rem;
-  outline: none;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #d1d1d1;
+    font-size: 0.8rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+input:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(123, 47, 247, 0.3);
+    transition: 0.5s;
 }
 
 .forgot-password {
@@ -124,16 +166,17 @@ body {
 }
 
 .btn {
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  font-weight: bold;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    background-color 0.3s;
-  color: white;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition:
+        transform 0.2s,
+        background-color 0.3s;
+    color: white;
 }
 
 .btn-primary {
@@ -153,6 +196,15 @@ body {
   background-color: #5a1ecf;
 }
 
+.btn-arrow {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    image-rendering: optimizeQuality;
+    vertical-align: middle;
+    filter: brightness(0) invert(1);
+}
+
 .separator {
   color: white;
   text-align: center;
@@ -161,16 +213,40 @@ body {
 }
 
 .password-field {
-  display: flex;
-  align-items: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+input[type="password"] { font-family: "Segoe UI", sans-serif; }
+
+.password-field input {
+
+    width: 100%;
+    padding-right: 44px;
+
 }
 
 .password-field button {
-  margin-left: 5px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-size: 16px;
+
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #888;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+    
+}
+
+.password-field button:hover {
+    
+    color: #333;
+    
 }
 
 /* Responsividade Básica */
