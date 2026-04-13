@@ -72,4 +72,3 @@ VALUES (1, 'teste@gmail.com', '123456cuCU@!', 'testador', 'Larissa');
 
 USE socialbit;
 SELECT * FROM Usuario;
-SELECT * FROM socialbit.Usuario;

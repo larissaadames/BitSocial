@@ -100,8 +100,8 @@ window.addEventListener("mousemove", (e) => {
   bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
 });
 
-// No arquivo public/Cadastro/script.js
-// Seleciona o formulário (certifique-se de que é o formulário de cadastro)
+// NÃO MEXER NA PARTE DO BANCO DE DADOS PQ FINALMENTE TA FUNCIONANDO
+
 const cadastroForm = document.querySelector("form");
 
 cadastroForm.addEventListener("submit", async function (e) {
