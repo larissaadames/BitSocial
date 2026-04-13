@@ -20,3 +20,13 @@ window.addEventListener('mousemove', (e) => {
     let moveY = (y - 0.5) * -40;
     bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
 });
+
+// Exemplo simplificado para o seu public/Login/script.js
+const response = await fetch('/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        email: inputEmail.value, 
+        senha: inputSenha.value 
+    })
+});
