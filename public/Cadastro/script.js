@@ -100,3 +100,39 @@ window.addEventListener('mousemove', (e) => {
     let moveY = (y - 0.5) * -40;
     bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
 });
+
+const cadastroForm = document.querySelector('form');
+
+cadastroForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    // Captura os dados do formulário
+    const dados = {
+        username: document.getElementById('username').value,
+        dtNasc: document.getElementById('dtNasc').value,
+        senha: document.getElementById('senha').value,
+        email: document.getElementById('email').value,
+        nome: document.getElementById('nome').value,
+        sobrenome: document.getElementById('sobrenome').value,
+        telefone: document.getElementById('telefone').value
+    };
+
+    try {
+        const response = await fetch('/usuarios', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("Cadastro realizado! Agora faça seu login.");
+            window.location.href = "../Login/login.html"; // Redireciona para o login
+        } else {
+            alert("Erro no cadastro: " + result.detail);
+        }
+    } catch (error) {
+        console.error("Erro:", error);
+    }
+});

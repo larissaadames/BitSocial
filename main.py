@@ -60,3 +60,29 @@ async def login(dados: LoginRequest, db: Session = Depends(get_db)):
 @app.get("/")
 async def root():
     return {"message": "API BitSocial Online. Acesse /public/Login/login.html"}
+
+# Esquema para os dados de Cadastro
+class CadastroUsuario(BaseModel):
+    username: str
+    dtNasc: str # Recebido como string do HTML (YYYY-MM-DD)
+    senha: str
+    email: str
+    nome: str
+    sobrenome: str
+    telefone: str
+
+@app.post("/usuarios")
+async def cadastrar_usuario(usuario: CadastroUsuario, db: Session = Depends(get_db)):
+    novo_usuario = Usuario(
+        username=usuario.username,
+        dtNasc=usuario.dtNasc,
+        senha=usuario.senha,
+        email=usuario.email,
+        nome=usuario.nome,
+        sobrenome=usuario.sobrenome,
+        telefone=usuario.telefone
+    )
+    db.add(novo_usuario)
+    db.commit()  # ESTA LINHA É OBRIGATÓRIA PARA SALVAR NO DISCO
+    db.refresh(novo_usuario)
+    return {"message": "Usuário cadastrado com sucesso"}

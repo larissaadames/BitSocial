@@ -2,7 +2,7 @@ USE socialbit;
 /* Lógico_1: */
 
 CREATE TABLE Usuario (
-    ID INT PRIMARY KEY,
+    ID INT PRIMARY KEY AUTO_INCREMENT,
     username varchar(25),
     dtNasc date,
     senha varchar(25),
