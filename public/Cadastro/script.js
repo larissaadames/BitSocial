@@ -102,9 +102,8 @@ window.addEventListener('mousemove', (e) => {
 });
 
 
+// NÃO MEXER NA PARTE DO BANCO DE DADOS PQ FINALMENTE TA FUNCIONANDO
 
-// No arquivo public/Cadastro/script.js
-// Seleciona o formulário (certifique-se de que é o formulário de cadastro)
 const cadastroForm = document.querySelector("form");
 
 cadastroForm.addEventListener("submit", async function (e) {
