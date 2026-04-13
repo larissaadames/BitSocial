@@ -100,3 +100,31 @@ window.addEventListener('mousemove', (e) => {
     let moveY = (y - 0.5) * -40;
     bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
 });
+
+const senha = document.getElementById("senha");
+
+const rules = {
+  len: document.getElementById("rule-len"),
+  upper: document.getElementById("rule-upper"),
+  lower: document.getElementById("rule-lower"),
+  num: document.getElementById("rule-num"),
+  symbol: document.getElementById("rule-symbol"),
+};
+
+senha.addEventListener("input", () => {
+  const value = senha.value;
+
+  toggle(rules.len, value.length >= 8);
+  toggle(rules.upper, /[A-Z]/.test(value));
+  toggle(rules.lower, /[a-z]/.test(value));
+  toggle(rules.num, /\d/.test(value));
+  toggle(rules.symbol, /[@$!%*?&]/.test(value));
+});
+
+function toggle(element, isValid) {
+  if (isValid) {
+    element.style.color = "green";
+  } else {
+    element.style.color = "red";
+  }
+}
