@@ -100,3 +100,48 @@ window.addEventListener('mousemove', (e) => {
     let moveY = (y - 0.5) * -40;
     bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
 });
+
+
+
+// No arquivo public/Cadastro/script.js
+// Seleciona o formulário (certifique-se de que é o formulário de cadastro)
+const cadastroForm = document.querySelector("form");
+
+cadastroForm.addEventListener("submit", async function (e) {
+  e.preventDefault(); // Impede o recarregamento da página
+
+  // Captura os valores garantindo que os IDs existam no seu HTML
+// Dentro do cadastroForm.addEventListener("submit", ...)
+const dados = {
+    username: document.getElementById("usuario")?.value || "",
+    dtNasc: document.getElementById("dt-nasc")?.value || "",
+    email: document.querySelector('input[type="email"]')?.value || "",
+    senha: document.getElementById("senha-cad")?.value || document.getElementById("senha")?.value, 
+    nome: document.getElementById("nome")?.value || "",
+    sobrenome: document.getElementById("sobrenome")?.value || "",
+    telefone: document.getElementById("telefone")?.value || ""
+};
+
+  try {
+    const response = await fetch('/usuarios', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dados)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Usuário cadastrado com sucesso!");
+      window.location.href = "/public/Login/login.html"; // Redireciona após sucesso
+    } else {
+      // Exibe detalhes do erro 422 para ajudar no debug
+      console.error("Erro de validação:", data.detail);
+      alert("Erro no cadastro. Verifique o console para detalhes.");
+    }
+  } catch (error) {
+    console.error("Erro ao conectar com a API:", error);
+  }
+});

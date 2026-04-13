@@ -1,4 +1,5 @@
-USE socialbit;
+
+
 /* Lógico_1: */
 
 CREATE TABLE Usuario (
@@ -64,11 +65,11 @@ ALTER TABLE Votacao ADD CONSTRAINT FK_Votacao_3
     REFERENCES Usuario (ID)
     ON DELETE SET NULL;
     
-DELETE FROM Usuario;
-    
+
 INSERT INTO Usuario (ID, email, senha, username, nome) 
 VALUES (1, 'teste@gmail.com', '123456cuCU@!', 'testador', 'Larissa');
 
 
 USE socialbit;
 SELECT * FROM Usuario;
+SELECT * FROM socialbit.Usuario;
