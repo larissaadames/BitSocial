@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 # 1. Configuração do Banco de Dados (MySQL)
 # Substitua 'usuario' e 'senha' pelos seus dados do MySQL Local
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://usuario:senha@localhost/socialbit"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:1234@localhost/socialbit"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
