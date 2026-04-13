@@ -11,7 +11,6 @@ from datetime import date, datetime
 from db import get_db
 
 app = FastAPI()
-
 # Configuração de sessão
 # app.add_middleware(
 #     SessionMiddleware,
