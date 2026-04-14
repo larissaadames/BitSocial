@@ -181,3 +181,10 @@ function toggle(element, isValid) {
     element.style.color = "red";
   }
 }
+
+// Coloca isso no início de cada página protegida
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "/cadastro.html";
+}
