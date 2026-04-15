@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
+from fastapi.security import OAuth2PasswordBearer
 
 # 1. Configuração do Banco de Dados
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:1234@localhost/socialbit"
@@ -79,3 +80,5 @@ async def cadastrar_usuario(usuario: CadastroUsuario, db: Session = Depends(get_
     db.commit()
     db.refresh(novo_usuario)
     return {"message": "Usuário cadastrado com sucesso"}
+
+    # 6. 
