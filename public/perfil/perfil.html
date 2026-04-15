@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social - Perfil</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme" id="app-body">
+
+    <header class="app-header">
+        <div class="header-container">
+            <a href="../home/index.html" class="logo-section logo-link" aria-label="Ir para a pagina inicial">
+                <span class="logo-text">Social</span>
+                <div class="logo-icon"></div>
+            </a>
+            <div class="search-section">
+                <input type="text" placeholder="Pesquisar" class="search-bar">
+            </div>
+            <a href="perfil.html" class="user-section user-link" aria-label="Ir para o perfil">
+                <div class="header-user-avatar" id="header-avatar"></div>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="profile-grid">
+            <section class="edit-section" id="edit-form">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" class="edit-input" id="input-nome" placeholder="Nome">
+                </div>
+                <div class="form-group">
+                    <label>Sobrenome</label>
+                    <input type="text" class="edit-input" id="input-sobrenome" placeholder="Sobrenome">
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="edit-input" id="input-user" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" class="edit-input" placeholder="Nova senha">
+                </div>
+                <div class="form-group">
+                    <label>Confirmar senha</label>
+                    <input type="password" class="edit-input" placeholder="Confirmar senha">
+                </div>
+            </section>
+
+            <aside class="sidebar">
+                <div class="sticky-wrapper">
+                    <div class="profile-avatar-big" id="avatar-display">
+                        <div class="avatar-overlay">Alterar Foto</div>
+                    </div>
+
+                    <input type="file" id="profile-upload" accept="image/*" style="display: none;">
+
+                    <div class="user-details" id="view-info">
+                        <h1 class="display-name" id="display-name">Nome Sobrenome</h1>
+                        <span class="user-handle" id="display-username">@username</span>
+                    </div>
+
+                    <button class="btn-main" id="btn-action">Editar Perfil</button>
+                </div>
+            </aside>
+
+            <section class="feed" id="posts-feed">
+                <article class="post-card"></article>
+                <article class="post-card"></article>
+                <article class="post-card"></article>
+                <article class="post-card"></article>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

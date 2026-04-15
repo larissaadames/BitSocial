@@ -1,8 +1,9 @@
-USE socialbit;
+
+
 /* Lógico_1: */
 
 CREATE TABLE Usuario (
-    ID INT PRIMARY KEY,
+    ID INT PRIMARY KEY AUTO_INCREMENT,
     username varchar(25),
     dtNasc date,
     senha varchar(25),
@@ -63,3 +64,11 @@ ALTER TABLE Votacao ADD CONSTRAINT FK_Votacao_3
     FOREIGN KEY (fk_Usuario_ID)
     REFERENCES Usuario (ID)
     ON DELETE SET NULL;
+    
+
+INSERT INTO Usuario (ID, email, senha, username, nome) 
+VALUES (1, 'teste@gmail.com', '123456cuCU@!', 'testador', 'Larissa');
+
+
+USE socialbit;
+SELECT * FROM Usuario;

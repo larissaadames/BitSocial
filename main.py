@@ -1,269 +1,109 @@
-import pymysql
-import base64
-
-from mangum import Mangum
-from fastapi import FastAPI, Request, Form, Depends, UploadFile, File
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from starlette.middleware.sessions import SessionMiddleware
-from datetime import date, datetime
-from db import get_db
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+from pydantic import BaseModel
 
+# 1. Configuração do Banco de Dados
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:1234@localhost/socialbit"
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# 2. Modelo do Banco (Tabela)
+class Usuario(Base):
+    __tablename__ = "Usuario"
+    ID = Column(Integer, primary_key=True, index=True)
+    username = Column(String(25))
+    dtNasc = Column(String(10)) 
+    email = Column(String(100), unique=True)
+    senha = Column(String(25))
+    nome = Column(String(50))
+    sobrenome = Column(String(50))
+    telefone = Column(String(20))
+
+# 3. Esquemas de Validação (Pydantic) - DEVEM VIR ANTES DAS ROTAS
+class LoginRequest(BaseModel):
+    email: str
+    senha: str
+
+class CadastroUsuario(BaseModel):
+    username: str
+    dtNasc: str
+    senha: str
+    email: str
+    nome: str
+    sobrenome: str
+    telefone: str
+
+# 4. Inicialização do App
 app = FastAPI()
+app.mount("/public", StaticFiles(directory="public"), name="public")
 
-# Configuração de sessão
-# app.add_middleware(
-#     SessionMiddleware,
-#     secret_key="clinica",
-#     session_cookie="clinica_session",
-#     max_age = 50000,  # (50 = 5 segundos)
-#     same_site="lax",
-#     https_only=False
-# )
-
-# Configuração de arquivos estáticos
-app.mount("/public", StaticFiles(directory="static"), name="static")
-
-# Configuração de templates Jinja2
-templates = Jinja2Templates(directory="templates")
-
-@app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-        return RedirectResponse(url="/medListar", status_code=303)
-
-@app.get("/medListar", name="medListar", response_class=HTMLResponse)
-async def listar_medicos(request: Request, db=Depends(get_db)):
-
-    with db.cursor(pymysql.cursors.DictCursor) as cursor:
-        # Consulta SQL unindo Medico e Especialidade, ordenando por nome
-        sql = """
-            SELECT M.ID_Medico, M.CRM, M.Nome, E.Nome_Espec AS Especialidade,
-            M.Foto, M.Dt_Nasc
-            FROM Medico AS M
-            JOIN Especialidade AS E ON M.fk_ID_Espec = E.ID_Espec 
-            ORDER BY M.Nome;
-        """
-        cursor.execute(sql)
-        medicos = cursor.fetchall()  # lista de dicts com dados dos médicos
-
-    # Processa os dados (calcula idade e converte foto para base64 se necessário)
-    hoje = date.today()
-    for med in medicos:
-        # Calcula idade baseado em Dt_Nasc (formato date/datetime do MySQL)
-        dt_nasc = med["Dt_Nasc"]
-        if isinstance(dt_nasc, str):
-            # Se vier como string "YYYY-MM-DD", converte para date
-            ano, mes, dia = map(int, dt_nasc.split("-"))
-            dt_nasc = date(ano, mes, dia)
-        idade = hoje.year - dt_nasc.year
-        # Ajusta se aniversário ainda não ocorreu no ano corrente
-        if (dt_nasc.month, dt_nasc.day) > (hoje.month, hoje.day):
-            idade -= 1
-        med["idade"] = idade
-
-        # Converter foto blob para base64 (se houver)
-        if med["Foto"]:
-            med["Foto_base64"] = base64.b64encode(med["Foto"]).decode('utf-8')
-        else:
-            med["Foto_base64"] = None
-
-    agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-    # Renderiza o template 'medListar.html' com os dados dos médicos
-    return templates.TemplateResponse("medListar.html", {
-        "request": request,
-        "medicos": medicos,
-        "hoje": agora
-    })
-
-@app.get("/medIncluir", response_class=HTMLResponse)
-async def medIncluir(request: Request, db=Depends(get_db)):
-    # Obter especialidades do banco para o combo
-    with db.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT ID_Espec, Nome_Espec FROM Especialidade")
-        especialidades = cursor.fetchall()
-    db.close()
-
-    # Dados para o template (incluindo data/hora e nome do usuário)
-    nome_usuario = request.session.get("nome_usuario", None)
-    perfil = request.session.get("perfil", None)
-    agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    return templates.TemplateResponse("medIncluir.html", {
-        "request": request,
-        "especialidades": especialidades,
-        "hoje": agora,
-        "nome_usuario": nome_usuario,
-        "perfil": perfil
-    })
-
-@app.post("/medIncluir_exe")
-async def medIncluir_exe(
-    request: Request,
-    Nome: str = Form(...),
-    CRM: str = Form(...),
-    Especialidade: str = Form(...),
-    DataNasc: str = Form(None),
-    Imagem: UploadFile = File(None),
-    db=Depends(get_db)
-):
-    foto_bytes = None
-    if Imagem and Imagem.filename:
-        foto_bytes = await Imagem.read()
-
+def get_db():
+    db = SessionLocal()
     try:
-        with db.cursor() as cursor:
-            sql = """INSERT INTO Medico (Nome, CRM, fk_ID_Espec, Dt_Nasc, Foto)
-                        VALUES (%s, %s, %s, %s, %s)"""
-            cursor.execute(sql, (Nome, CRM, Especialidade, DataNasc, foto_bytes))
-            db.commit()
-
-        request.session["mensagem_header"] = "Inclusão de Novo Médico"
-        request.session["mensagem"] = "Registro cadastrado com sucesso!"
-    except Exception as e:
-        request.session["mensagem_header"] = "Erro ao cadastrar"
-        request.session["mensagem"] = str(e)
+        yield db
     finally:
         db.close()
 
-    agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+# 5. Rotas
+@app.get("/")
+async def root():
+    return {"message": "API BitSocial Online. Acesse /public/Login/login.html"}
 
-    return templates.TemplateResponse("medIncluir_exe.html", {
-        "request": request,
-        "mensagem_header": request.session.get("mensagem_header", ""),
-        "mensagem": request.session.get("mensagem", ""),
-        "hoje": agora
-    })
+@app.post("/login")
+async def login(dados: LoginRequest, db: Session = Depends(get_db)):
+    usuario = db.query(Usuario).filter(Usuario.email == dados.email).first()
+    if not usuario or usuario.senha != dados.senha:
+        raise HTTPException(status_code=401, detail="E-mail ou senha incorretos")
+    return {"message": "Sucesso", "username": usuario.username}
 
-@app.get("/medExcluir", response_class=HTMLResponse)
-async def med_excluir(request: Request, id: int, db=Depends(get_db)):
+@app.post("/usuarios")
+async def cadastrar_usuario(usuario: CadastroUsuario, db: Session = Depends(get_db)):
+    db_user = db.query(Usuario).filter(Usuario.email == usuario.email).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email já cadastrado")
 
-    with db.cursor(pymysql.cursors.DictCursor) as cursor:
-        sql = ("SELECT M.ID_Medico, M.Nome, M.CRM, M.Dt_Nasc, E.Nome_Espec "
-               "FROM Medico M JOIN Especialidade E ON M.fk_ID_Espec = E.ID_Espec "
-               "WHERE M.ID_Medico = %s")
-        cursor.execute(sql, (id,))
-        medico = cursor.fetchone()
-    db.close()
+    novo_usuario = Usuario(
+        username=usuario.username,
+        dtNasc=usuario.dtNasc,
+        senha=usuario.senha,
+        email=usuario.email,
+        nome=usuario.nome,
+        sobrenome=usuario.sobrenome,
+        telefone=usuario.telefone
+    )
+    db.add(novo_usuario)
+    db.commit()
+    db.refresh(novo_usuario)
+    return {"message": "Usuário cadastrado com sucesso"}
 
-    # Formatar data (YYYY-MM-DD para dd/mm/aaaa)
-    data_nasc = medico["Dt_Nasc"]
-    if isinstance(data_nasc, str):
-        ano, mes, dia = data_nasc.split("-")
-    else:
-        ano, mes, dia = data_nasc.year, f"{data_nasc.month:02d}", f"{data_nasc.day:02d}"
-    data_formatada = f"{dia}/{mes}/{ano}"
+@app.get("/usuarios/busca")
+async def buscar_usuarios(username: str, db: Session = Depends(get_db)):
+    termo = username.strip()
 
-    hoje = datetime.now().strftime("%d/%m/%Y %H:%M")
+    if not termo:
+        return []
 
-    return templates.TemplateResponse("medExcluir.html", {
-        "request": request,
-        "med": medico,
-        "data_formatada": data_formatada,
-        "hoje": hoje
-    })
+    usuarios = (
+        db.query(Usuario)
+        .filter(Usuario.username.like(f"%{termo}%"))
+        .order_by(Usuario.username.asc())
+        .limit(10)
+        .all()
+    )
 
-@app.post("/medExcluir_exe")
-async def med_excluir_exe(request: Request, id: int = Form(...), db=Depends(get_db)):
+    return [
+        {
+            "id": usuario.ID,
+            "username": usuario.username,
+            "nome": usuario.nome,
+            "sobrenome": usuario.sobrenome,
+        }
+        for usuario in usuarios
+    ]
+# 6. 
 
-    try:
-        with db.cursor(pymysql.cursors.DictCursor) as cursor:
 
-            sql_delete = "DELETE FROM Medico WHERE ID_Medico = %s"
-            cursor.execute(sql_delete, (id,))
-            db.commit()
-
-            request.session["mensagem_header"] = "Exclusão de Médico"
-            request.session["mensagem"] = f"Médico excluído com sucesso."
-
-    except Exception as e:
-        request.session["mensagem_header"] = "Erro ao excluir"
-        request.session["mensagem"] = str(e)
-    finally:
-        db.close()
-
-    # Redireciona para a página de resultado da exclusão
-    return templates.TemplateResponse("medExcluir_exe.html", {
-        "request": request,
-        "mensagem_header": request.session.get("mensagem_header", ""),
-        "mensagem": request.session.get("mensagem", ""),
-        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M")
-    })
-
-@app.get("/medAtualizar", response_class=HTMLResponse)
-async def med_atualizar(request: Request, id: int, db=Depends(get_db)):
-
-    with db.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT * FROM Medico WHERE ID_Medico = %s", (id,))
-        medico = cursor.fetchone()
-        cursor.execute("SELECT ID_Espec, Nome_Espec FROM Especialidade")
-        especialidades = cursor.fetchall()
-    db.close()
-
-    hoje = datetime.now().strftime("%d/%m/%Y %H:%M")
-   
-   # Converter foto blob para base64 (se houver)
-    if medico["foto"]:
-        medico["Foto_base64"] = base64.b64encode(medico["foto"]).decode('utf-8')
-    else:
-        medico["Foto_base64"] = None
-
-    return templates.TemplateResponse("medAtualizar.html", {
-        "request": request,
-        "med": medico,
-        "especialidades": especialidades,
-        "hoje": hoje
-    })
-
-@app.post("/medAtualizar_exe")
-async def med_atualizar_exe(
-    request: Request,
-    id: int = Form(...),
-    Nome: str = Form(...),
-    CRM: str = Form(...),
-    Especialidade: str = Form(...),
-    DataNasc: str = Form(None),
-    Imagem: UploadFile = File(None),
-    db=Depends(get_db)
-):
-    foto_bytes = None
-    if Imagem and Imagem.filename:
-        foto_bytes = await Imagem.read()
-
-    try:
-        with db.cursor() as cursor:
-            if foto_bytes:
-                sql = """UPDATE Medico 
-                         SET Nome=%s, CRM=%s, Dt_Nasc=%s, fk_ID_Espec=%s, Foto=%s
-                         WHERE ID_Medico=%s"""
-                cursor.execute(sql, (Nome, CRM, DataNasc, Especialidade, foto_bytes, id))
-            else:
-                sql = """UPDATE Medico 
-                         SET Nome=%s, CRM=%s, Dt_Nasc=%s, fk_ID_Espec=%s
-                         WHERE ID_Medico=%s"""
-                cursor.execute(sql, (Nome, CRM, DataNasc, Especialidade, id))
-            db.commit()
-
-        request.session["mensagem_header"] = "Atualização de Médico"
-        request.session["mensagem"] = "Registro atualizado com sucesso!"
-
-    except Exception as e:
-        request.session["mensagem_header"] = "Erro ao atualizar"
-        request.session["mensagem"] = sql + str(e)
-    finally:
-        db.close()
-
-    return templates.TemplateResponse("medAtualizar_exe.html", {
-        "request": request,
-        "mensagem_header": request.session.get("mensagem_header", ""),
-        "mensagem": request.session.get("mensagem", ""),
-        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M")
-    })
-
-@app.post("/reset_session")
-async def reset_session(request: Request):
-    request.session.pop("mensagem_header", None)
-    request.session.pop("mensagem", None)
-    return {"status": "ok"}
-
-Mangum(app)
