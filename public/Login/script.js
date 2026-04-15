@@ -76,8 +76,8 @@ loginForm.addEventListener("submit", async (event) => {
   }
 });
 
-const token = localStorage.getItem("token");
+// const token = localStorage.getItem("token");
 
-if (!token) {
-  window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
-}
+// if (!token) {
+//   window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
+// }
