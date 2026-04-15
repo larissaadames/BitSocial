@@ -65,8 +65,8 @@ loginForm.addEventListener("submit", async (event) => {
     const data = await lerResposta(response);
 
     if (response.ok) {
-      console.log("Login bem-sucedido para:", data.username);
-      window.location.href = `${APP_BASE_URL}/public/perfil/perfil.html`;
+    localStorage.setItem("token", data.token);
+    window.location.href = `${APP_BASE_URL}/public/perfil/perfil.html`;
     } else {
       alert("Falha no login: " + (data.detail || "E-mail ou senha incorretos."));
     }
@@ -76,4 +76,8 @@ loginForm.addEventListener("submit", async (event) => {
   }
 });
 
+const token = localStorage.getItem("token");
 
+if (!token) {
+  window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
+}
