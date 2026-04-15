@@ -408,3 +408,24 @@ input[type="password"] {
     text-align: center;
   }
 }
+
+/* NOVA LÓGICA: Asterisco em campos obrigatórios */
+.input-group label:has(+ input[required])::after,
+.input-group label:has(+ .password-field input[required])::after {
+  content: " *";
+  color: #ff4d4d;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+/* Garante que o checklist de senha tenha estilo de lista */
+.password-checklist {
+  list-style: none;
+  font-size: 0.75rem;
+  padding-left: 5px;
+}
+
+.password-checklist li {
+  color: var(--text-label);
+  transition: color 0.3s;
+}

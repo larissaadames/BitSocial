@@ -6,7 +6,7 @@
     <title>Social - Perfil</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="dark-theme">
+<body class="dark-theme" id="app-body">
 
     <header class="app-header">
         <div class="header-container">
@@ -14,11 +14,9 @@
                 <span class="logo-text">Social</span>
                 <div class="logo-icon"></div>
             </div>
-            
             <div class="search-section">
                 <input type="text" placeholder="Pesquisar" class="search-bar">
             </div>
-
             <div class="user-section">
                 <div class="header-user-avatar"></div>
             </div>
@@ -26,8 +24,31 @@
     </header>
 
     <main class="main-content">
-        <div class="profile-grid">
+        <div class="profile-grid" id="profile-grid">
             
+            <section class="edit-section">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" class="edit-input" placeholder="Nome">
+                </div>
+                <div class="form-group">
+                    <label>Sobrenome</label>
+                    <input type="text" class="edit-input" placeholder="Sobrenome">
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="edit-input" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" class="edit-input" placeholder="Senha">
+                </div>
+                <div class="form-group">
+                    <label>Confirmar senha</label>
+                    <input type="password" class="edit-input" placeholder="Confirmar senha">
+                </div>
+            </section>
+
             <aside class="sidebar">
                 <div class="sticky-wrapper">
                     <div class="profile-avatar-big" id="avatar-display">
@@ -36,17 +57,16 @@
                     
                     <input type="file" id="profile-upload" accept="image/*" style="display: none;">
                     
-                    <div class="user-details">
+                    <div class="user-details" id="user-details-view">
                         <h1 class="display-name">Nome Sobrenome</h1>
                         <span class="user-handle">@username</span>
                     </div>
 
-                    <button class="btn-edit" id="btn-edit-mode">Editar Perfil</button>
+                    <button class="btn-main" id="btn-toggle-edit">Editar Perfil</button>
                 </div>
             </aside>
 
-            <section class="feed">
-                <article class="post-card"></article>
+            <section class="feed" id="feed-section">
                 <article class="post-card"></article>
                 <article class="post-card"></article>
                 <article class="post-card"></article>
