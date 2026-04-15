@@ -1,62 +1,60 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleção de elementos
     const body = document.getElementById('app-body');
-    const btnToggle = document.getElementById('btn-toggle-edit');
+    const btnAction = document.getElementById('btn-action');
     const avatarDisplay = document.getElementById('avatar-display');
     const profileUpload = document.getElementById('profile-upload');
+    const headerAvatar = document.getElementById('header-avatar');
 
     /**
-     * Alterna entre Modo de Visualização e Modo de Edição
+     * Controle do Botão Principal (Editar / Salvar)
      */
-    btnToggle.addEventListener('click', () => {
-        // Alterna a classe no body que controla o CSS
-        const isEditing = body.classList.toggle('editing-mode');
-        
-        // Atualiza o texto do botão conforme o estado
-        if (isEditing) {
-            btnToggle.textContent = "Salvar Alterações";
+    btnAction.addEventListener('click', () => {
+        const isCurrentlyEditing = body.classList.contains('editing-mode');
+
+        if (isCurrentlyEditing) {
+            // LÓGICA DE SALVAR
+            saveProfile();
         } else {
-            btnToggle.textContent = "Editar Perfil";
-            // Aqui você pode adicionar a lógica de envio para o servidor/Firebase
-            console.log("Dados salvos!");
+            // LÓGICA DE ENTRAR NA EDIÇÃO
+            enterEditMode();
         }
     });
 
+    function enterEditMode() {
+        body.classList.add('editing-mode');
+        btnAction.textContent = "Salvar Alterações";
+    }
+
+    function saveProfile() {
+        // 1. Simulação de processamento de dados
+        console.log("Salvando informações no banco de dados...");
+
+        // 2. Feedback ao usuário
+        alert("Alterações salvas com sucesso!");
+
+        // 3. O PASSO QUE VOCÊ PEDIU: Voltar para o modo de visualização
+        body.classList.remove('editing-mode');
+        btnAction.textContent = "Editar Perfil";
+    }
+
     /**
-     * Lógica para Alterar Imagem de Perfil
+     * Lógica de Troca de Foto
      */
-    
-    // Abre o seletor de arquivos ao clicar no círculo da foto
     avatarDisplay.addEventListener('click', () => {
         profileUpload.click();
     });
 
-    // Detecta quando um arquivo é selecionado
     profileUpload.addEventListener('change', function() {
         const file = this.files[0];
-        
-        if (file) {
-            // Verifica se é realmente uma imagem
-            if (!file.type.startsWith('image/')) {
-                alert('Por favor, selecione um arquivo de imagem válido.');
-                return;
-            }
-
+        if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
-            
-            // Quando a leitura do arquivo terminar
-            reader.onload = function(e) {
-                // Aplica a imagem como fundo (background-image)
-                avatarDisplay.style.backgroundImage = `url(${e.target.result})`;
-                
-                // Opcional: Atualizar também o mini avatar do header
-                const headerAvatar = document.querySelector('.header-user-avatar');
+            reader.onload = (e) => {
+                const imageUrl = `url(${e.target.result})`;
+                avatarDisplay.style.backgroundImage = imageUrl;
                 if (headerAvatar) {
-                    headerAvatar.style.backgroundImage = `url(${e.target.result})`;
-                    headerAvatar.style.backgroundSize = 'cover';
+                    headerAvatar.style.backgroundImage = imageUrl;
                 }
-            }
-            
+            };
             reader.readAsDataURL(file);
         }
     });

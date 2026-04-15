@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <span class="logo-text">Social</span>
+                <div class="logo-icon"></div>
+            </div>
+            <div class="search-section">
+                <input type="text" placeholder="Pesquisar" class="search-bar">
+            </div>
+            <div class="user-section">
+                <div class="header-user-avatar"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="home-grid">
+            
+            <nav class="nav-sidebar">
+                <div class="nav-item active">
+                    <span class="nav-icon">🏠</span>
+                    Página Inicial
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">🔖</span>
+                    Salvos
+                </div>
+                <div class="nav-placeholder"></div>
+                <div class="nav-placeholder"></div>
+            </nav>
+
+            <section class="feed-section">
+                
+                <div class="create-post-card">
+                    <h2 class="post-prompt">> Qual foi o bug de hoje?</h2>
+                    <button class="btn-postar">Postar</button>
+                </div>
+
+                <div class="feed-scroll">
+                    
+                    <article class="post-card">
+                        <header class="post-header">
+                            <div class="post-user-avatar"></div>
+                            <span class="post-user-name">davi cagnato</span>
+                        </header>
+                        
+                        <div class="post-content-box">
+                            <p class="post-text">
+                                alguem sabe como que faz pra debugar o codigo de python no intellij??? <br><br>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            </p>
+                        </div>
+
+                        <footer class="post-footer">
+                            <div class="post-votes">
+                                <span class="vote-arrow">↑</span>
+                                <span class="vote-count">18</span>
+                                <span class="vote-arrow">↓</span>
+                            </div>
+                            <div class="post-reactions">
+                                <span class="reaction-count">4</span>
+                                <span class="reaction-icon">💡</span>
+                            </div>
+                        </footer>
+                    </article>
+
+                    <article class="post-card"></article>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+</body>
+</html>

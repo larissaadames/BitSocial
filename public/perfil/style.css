@@ -1,21 +1,16 @@
-/* --- RESET E ESTILOS TOTAIS --- */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
+/* --- RESET --- */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
 body.dark-theme {
-    background-color: #000000;
-    color: #FFFFFF;
+    background-color: #000;
+    color: #fff;
     height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* O scroll acontece apenas dentro do feed */
+    overflow: hidden;
 }
 
-/* --- CABEÇALHO --- */
+/* HEADER */
 .app-header {
     background-color: #121212;
     border-bottom: 1px solid #222;
@@ -24,7 +19,6 @@ body.dark-theme {
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    z-index: 100;
 }
 
 .header-container {
@@ -36,91 +30,27 @@ body.dark-theme {
     align-items: center;
 }
 
-.logo-text {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -1px;
-}
+.logo-text { font-size: 22px; font-weight: 800; }
+.search-bar { background-color: #262626; border: none; border-radius: 8px; padding: 10px 15px; color: #fff; width: 350px; outline: none; }
+.header-user-avatar { width: 35px; height: 35px; background-color: #D9D9D9; border-radius: 50%; background-size: cover; }
 
-.search-bar {
-    background-color: #262626;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 15px;
-    color: #fff;
-    width: 350px;
-    outline: none;
-}
-
-.header-user-avatar {
-    width: 35px;
-    height: 35px;
-    background-color: #D9D9D9;
-    border-radius: 50%;
-}
-
-/* --- GRID PRINCIPAL --- */
-.main-content {
-    flex-grow: 1;
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-    height: 100%;
-}
+/* GRID E LAYOUT */
+.main-content { flex-grow: 1; width: 100%; max-width: 1100px; margin: 0 auto; height: 100%; }
 
 .profile-grid {
     display: grid;
-    grid-template-columns: 300px 1fr; /* Sidebar esquerda por padrão */
+    grid-template-columns: 300px 1fr;
     gap: 40px;
     height: 100%;
-    transition: all 0.4s ease-in-out;
+    transition: all 0.3s ease-in-out;
 }
 
-/* --- SEÇÃO DE EDIÇÃO (ESCONDIDA POR PADRÃO) --- */
-.edit-section {
-    display: none;
-    padding-top: 40px;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.form-group label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #fff;
-}
-
-.edit-input {
-    background-color: #262626;
-    border: 1px solid #333;
-    border-radius: 6px;
-    padding: 12px;
-    color: #fff;
-    outline: none;
-}
-
-/* --- SIDEBAR E FOTO --- */
-.sidebar {
-    padding-top: 40px;
-}
-
-.sticky-wrapper {
-    position: sticky;
-    top: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+/* SIDEBAR */
+.sidebar { padding-top: 40px; }
+.sticky-wrapper { position: sticky; top: 40px; display: flex; flex-direction: column; align-items: center; }
 
 .profile-avatar-big {
-    width: 180px;
-    height: 180px;
+    width: 180px; height: 180px;
     background-color: #D9D9D9;
     border-radius: 50%;
     margin-bottom: 20px;
@@ -129,22 +59,14 @@ body.dark-theme {
     overflow: hidden;
     background-size: cover;
     background-position: center;
-    transition: transform 0.2s;
 }
 
-.profile-avatar-big:active { transform: scale(0.98); }
-
 .avatar-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.3s;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 14px; font-weight: 600;
+    opacity: 0; transition: 0.3s;
 }
 
 .profile-avatar-big:hover .avatar-overlay { opacity: 1; }
@@ -154,55 +76,31 @@ body.dark-theme {
 .user-handle { color: #777; font-size: 14px; }
 
 .btn-main {
-    width: 100%;
-    background-color: #262626;
-    color: #fff;
-    border: 1px solid #333;
-    padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s, color 0.2s;
+    width: 100%; background-color: #262626; color: #fff;
+    border: 1px solid #333; padding: 12px; border-radius: 8px;
+    cursor: pointer; font-weight: 600; transition: 0.2s;
 }
 
-.btn-main:hover { background-color: #333; }
+/* FORMULÁRIO E FEED */
+.edit-section { display: none; padding-top: 40px; flex-direction: column; gap: 15px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.edit-input { background-color: #262626; border: 1px solid #333; border-radius: 6px; padding: 12px; color: #fff; outline: none; }
 
-/* --- FEED COM SCROLL --- */
-.feed {
-    padding: 40px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    overflow-y: auto;
-    height: 100%;
-    scrollbar-width: none;
-}
-
+.feed { padding: 40px 0; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; height: 100%; scrollbar-width: none; }
 .feed::-webkit-scrollbar { display: none; }
+.post-card { background-color: #121212; border: 1px solid #222; border-radius: 12px; width: 100%; min-height: 380px; flex-shrink: 0; }
 
-.post-card {
-    background-color: #121212;
-    border: 1px solid #222;
-    border-radius: 12px;
-    width: 100%;
-    min-height: 380px; /* Post 1 como base */
-    flex-shrink: 0;
-}
-
-/* --- ESTADO DE EDIÇÃO (MODO DE TROCA) --- */
-body.editing-mode .feed { display: none; }
-body.editing-mode .user-details { display: none; }
+/* --- LÓGICA DE MODO EDIÇÃO --- */
+body.editing-mode .feed, body.editing-mode .user-details { display: none; }
 body.editing-mode .edit-section { display: flex; }
 
 body.editing-mode .profile-grid {
-    grid-template-columns: 1fr 300px; /* Inverte posições */
+    grid-template-columns: 1fr 300px; /* Form na esquerda, Foto na direita */
 }
 
-body.editing-mode .sidebar {
-    order: 2; /* Move a foto para a direita */
-}
+body.editing-mode .sidebar { order: 2; }
 
 body.editing-mode .btn-main {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #fff;
+    color: #000;
 }
