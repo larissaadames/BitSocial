@@ -29,10 +29,12 @@ body {
   );
   color: var(--text-white);
   min-height: 100vh;
+  padding: 24px 16px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow-x: hidden;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -203,7 +205,7 @@ body::after {
 .registration-card {
   display: flex;
   background-color: var(--card-bg);
-  width: 95%;
+  width: 100%;
   max-width: 1050px;
   padding: 60px;
   border-radius: 28px;
@@ -244,10 +246,11 @@ body::after {
 /* 6. Lado do Formulário */
 .form-side {
   flex: 1.4;
+  min-width: 0;
 }
 
 h1 {
-  font-size: 3.5rem;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
   font-weight: 800;
   margin-bottom: 30px;
   text-align: left;
@@ -259,11 +262,16 @@ h1 {
   gap: 15px;
 }
 
+.form-grid > * {
+  min-width: 0;
+}
+
 /* 7. Estilização dos Inputs */
 .input-group {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  min-width: 0;
 }
 
 .full-width {
@@ -278,6 +286,8 @@ label {
 }
 
 input {
+  width: 100%;
+  min-width: 0;
   background-color: var(--input-bg);
   border: none;
   padding: 14px 18px;
@@ -298,6 +308,8 @@ input:focus {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .password-field input {
@@ -343,7 +355,7 @@ input:focus {
 }
 
 input[type="password"] {
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Orbitron", sans-serif;
 }
 
 /* 8. Botão e Links */
@@ -384,11 +396,16 @@ input[type="password"] {
 }
 
 /* 9. Responsividade (Mobile) */
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
+  body {
+    align-items: flex-start;
+  }
+
   .registration-card {
     flex-direction: column;
-    padding: 40px 20px;
-    margin: 20px;
+    padding: 40px 24px;
+    margin: 16px 0;
+    gap: 32px;
   }
 
   .form-side {
@@ -406,6 +423,46 @@ input[type="password"] {
   h1 {
     font-size: 2.5rem;
     text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 16px 12px 24px;
+  }
+
+  .registration-card {
+    padding: 24px 16px;
+    border-radius: 20px;
+    gap: 24px;
+  }
+
+  .illustrations-side {
+    min-width: 0;
+    gap: 16px;
+  }
+
+  .img-character {
+    max-width: 220px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-size: 0.75rem;
+  }
+
+  input {
+    padding: 13px 14px;
+    font-size: 0.92rem;
+  }
+
+  .btn-submit {
+    padding: 16px;
+    font-size: 1rem;
   }
 }
 

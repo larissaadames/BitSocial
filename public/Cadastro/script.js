@@ -1,4 +1,29 @@
-// --- Máscara Telefone ---
+const APP_BASE_URL = (() => {
+  const { protocol, hostname, port, origin } = window.location;
+  const isLocalhost = hostname === "127.0.0.1" || hostname === "localhost";
+
+  if (protocol === "file:") {
+    return "http://127.0.0.1:8000";
+  }
+
+  if (isLocalhost && port !== "8000") {
+    return "http://127.0.0.1:8000";
+  }
+
+  return origin;
+})();
+
+async function lerResposta(response) {
+  const texto = await response.text();
+
+  try {
+    return texto ? JSON.parse(texto) : {};
+  } catch {
+    return { detail: texto || "Erro inesperado no servidor." };
+  }
+}
+
+// --- Mascara Telefone ---
 const telefone = document.getElementById("telefone");
 telefone.addEventListener("input", function (e) {
   let valor = e.target.value.replace(/\D/g, "");
@@ -7,7 +32,7 @@ telefone.addEventListener("input", function (e) {
   e.target.value = valor;
 });
 
-// --- Data de Nascimento (Mínimo 16 anos) ---
+// --- Data de Nascimento (Minimo 16 anos) ---
 const dataNascimentoInput = document.getElementById("dt-nasc");
 const hoje = new Date();
 const dataMinima16 = new Date();
@@ -21,7 +46,7 @@ const formatarData = (data) => {
 };
 dataNascimentoInput.max = formatarData(dataMinima16);
 
-// --- Máscara Usuário ---
+// --- Mascara Usuario ---
 const usuarioInput = document.getElementById("usuario");
 usuarioInput.addEventListener("input", function () {
   let valor = this.value;
@@ -38,18 +63,17 @@ function togglePassword(id, btn) {
   const input = document.getElementById(id);
   const isPassword = input.type === "password";
   input.type = isPassword ? "text" : "password";
-  input.style.fontFamily = isPassword ? '"Orbitron", sans-serif' : '"Segoe UI", sans-serif';
 }
 
 // --- Efeito Background ---
 const bg = document.querySelector(".bg-geo");
 window.addEventListener("mousemove", (e) => {
-  let moveX = (e.clientX / window.innerWidth - 0.5) * -40;
-  let moveY = (e.clientY / window.innerHeight - 0.5) * -40;
+  const moveX = (e.clientX / window.innerWidth - 0.5) * -40;
+  const moveY = (e.clientY / window.innerHeight - 0.5) * -40;
   bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
 });
 
-// --- Validação Visual da Senha ---
+// --- Validacao Visual da Senha ---
 const senhaInput = document.getElementById("senha");
 const regrasValidacao = document.getElementById("regras-validacao");
 const rules = {
@@ -76,31 +100,28 @@ function toggleRule(el, isValid) {
   el.style.color = isValid ? "#2ecc71" : "#e74c3c";
 }
 
-// --- SUBMISSÃO DO FORMULÁRIO (COM BANCO DE DADOS) ---
+// --- Submissao do formulario ---
 const cadastroForm = document.getElementById("form-cadastro");
 
 cadastroForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  // 1. Validação de Telefone (Regex)
   const telValue = document.getElementById("telefone").value;
   const regexTel = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
   if (!regexTel.test(telValue)) {
-    alert("Telefone inválido");
+    alert("Telefone invalido");
     return;
   }
 
-  // 2. Validação de Igualdade de Senhas
   const s1 = document.getElementById("senha").value;
   const s2 = document.getElementById("senha-confirmar").value;
 
   if (s1 !== s2) {
-    alert("As senhas não coincidem!");
+    alert("As senhas nao coincidem!");
     document.getElementById("senha-confirmar").focus();
     return;
   }
 
-  // 3. Preparação dos Dados
   const dados = {
     username: document.getElementById("usuario").value,
     dtNasc: document.getElementById("dt-nasc").value,
@@ -111,25 +132,24 @@ cadastroForm.addEventListener("submit", async function (e) {
     telefone: telValue,
   };
 
-  // 4. Envio para a API
   try {
-    const response = await fetch("/usuarios", {
+    const response = await fetch(`${APP_BASE_URL}/usuarios`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dados),
     });
 
-    const data = await response.json();
+    const data = await lerResposta(response);
 
     if (response.ok) {
-      alert("Usuário cadastrado com sucesso!");
-      window.location.href = "/public/Login/login.html";
+      alert("Usuario cadastrado com sucesso!");
+      window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
     } else {
-      console.error("Erro de validação:", data.detail);
-      alert("Erro no cadastro. Verifique os campos.");
+      console.error("Erro de validacao:", data.detail);
+      alert("Erro no cadastro: " + (data.detail || "Verifique os campos."));
     }
   } catch (error) {
     console.error("Erro ao conectar com a API:", error);
-    alert("Erro de conexão com o servidor.");
+    alert("Erro de conexao com o servidor.");
   }
 });

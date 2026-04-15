@@ -10,38 +10,37 @@
 
     <header class="app-header">
         <div class="header-container">
-            <div class="logo-section">
+            <a href="../home/index.html" class="logo-section logo-link" aria-label="Ir para a pagina inicial">
                 <span class="logo-text">Social</span>
                 <div class="logo-icon"></div>
-            </div>
+            </a>
             <div class="search-section">
                 <input type="text" placeholder="Pesquisar" class="search-bar">
             </div>
-            <div class="user-section">
-                <div class="header-user-avatar"></div>
-            </div>
+            <a href="perfil.html" class="user-section user-link" aria-label="Ir para o perfil">
+                <div class="header-user-avatar" id="header-avatar"></div>
+            </a>
         </div>
     </header>
 
     <main class="main-content">
-        <div class="profile-grid" id="profile-grid">
-            
-            <section class="edit-section">
+        <div class="profile-grid">
+            <section class="edit-section" id="edit-form">
                 <div class="form-group">
                     <label>Nome</label>
-                    <input type="text" class="edit-input" placeholder="Nome">
+                    <input type="text" class="edit-input" id="input-nome" placeholder="Nome">
                 </div>
                 <div class="form-group">
                     <label>Sobrenome</label>
-                    <input type="text" class="edit-input" placeholder="Sobrenome">
+                    <input type="text" class="edit-input" id="input-sobrenome" placeholder="Sobrenome">
                 </div>
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" class="edit-input" placeholder="Username">
+                    <input type="text" class="edit-input" id="input-user" placeholder="Username">
                 </div>
                 <div class="form-group">
                     <label>Senha</label>
-                    <input type="password" class="edit-input" placeholder="Senha">
+                    <input type="password" class="edit-input" placeholder="Nova senha">
                 </div>
                 <div class="form-group">
                     <label>Confirmar senha</label>
@@ -54,25 +53,24 @@
                     <div class="profile-avatar-big" id="avatar-display">
                         <div class="avatar-overlay">Alterar Foto</div>
                     </div>
-                    
+
                     <input type="file" id="profile-upload" accept="image/*" style="display: none;">
-                    
-                    <div class="user-details" id="user-details-view">
-                        <h1 class="display-name">Nome Sobrenome</h1>
-                        <span class="user-handle">@username</span>
+
+                    <div class="user-details" id="view-info">
+                        <h1 class="display-name" id="display-name">Nome Sobrenome</h1>
+                        <span class="user-handle" id="display-username">@username</span>
                     </div>
 
-                    <button class="btn-main" id="btn-toggle-edit">Editar Perfil</button>
+                    <button class="btn-main" id="btn-action">Editar Perfil</button>
                 </div>
             </aside>
 
-            <section class="feed" id="feed-section">
+            <section class="feed" id="posts-feed">
                 <article class="post-card"></article>
                 <article class="post-card"></article>
                 <article class="post-card"></article>
                 <article class="post-card"></article>
             </section>
-
         </div>
     </main>
 
