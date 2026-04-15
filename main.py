@@ -81,4 +81,8 @@ async def cadastrar_usuario(usuario: CadastroUsuario, db: Session = Depends(get_
     db.refresh(novo_usuario)
     return {"message": "Usuário cadastrado com sucesso"}
 
-    # 6. 
+# 6. 
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
