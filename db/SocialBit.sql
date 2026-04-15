@@ -1,12 +1,11 @@
 
-
 /* Lógico_1: */
 
 CREATE TABLE Usuario (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     username varchar(25),
     dtNasc date,
-    senha varchar(25),
+    senha varchar(100),
     email varchar(100),
     nome varchar(25),
     sobrenome varchar(50),
@@ -67,8 +66,8 @@ ALTER TABLE Votacao ADD CONSTRAINT FK_Votacao_3
     
 
 INSERT INTO Usuario (ID, email, senha, username, nome) 
-VALUES (1, 'teste@gmail.com', '123456cuCU@!', 'testador', 'Larissa');
+VALUES (1, 'teste@gmail.com', '123456Teste@!', 'testador', 'Larissa');
 
 
-USE socialbit;
+
 SELECT * FROM Usuario;

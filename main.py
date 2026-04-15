@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer
 import secrets
+from fastapi.responses import RedirectResponse
 
 # 1. Configuração do Banco de Dados
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:1234@localhost/socialbit"
@@ -51,9 +52,11 @@ def get_db():
         db.close()
 
 # 5. Rotas
+
 @app.get("/")
 async def root():
-    return {"message": "API BitSocial Online. Acesse /public/Login/login.html"}
+    # Redireciona diretamente para o caminho do arquivo HTML
+    return RedirectResponse(url="/public/Login/login.html")
 
 @app.post("/login")
 async def login(dados: LoginRequest, db: Session = Depends(get_db)):
