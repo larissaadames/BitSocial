@@ -68,6 +68,4 @@ ALTER TABLE Votacao ADD CONSTRAINT FK_Votacao_3
 INSERT INTO Usuario (ID, email, senha, username, nome) 
 VALUES (1, 'teste@gmail.com', '123456Teste@!', 'testador', 'Larissa');
 
-
-
 SELECT * FROM Usuario;
