@@ -81,4 +81,27 @@ async def cadastrar_usuario(usuario: CadastroUsuario, db: Session = Depends(get_
     db.refresh(novo_usuario)
     return {"message": "Usuário cadastrado com sucesso"}
 
-    # 6. 
+@app.get("/usuarios/busca")
+async def buscar_usuarios(username: str, db: Session = Depends(get_db)):
+    termo = username.strip()
+
+    if not termo:
+        return []
+
+    usuarios = (
+        db.query(Usuario)
+        .filter(Usuario.username.like(f"%{termo}%"))
+        .order_by(Usuario.username.asc())
+        .limit(10)
+        .all()
+    )
+
+    return [
+        {
+            "id": usuario.ID,
+            "username": usuario.username,
+            "nome": usuario.nome,
+            "sobrenome": usuario.sobrenome,
+        }
+        for usuario in usuarios
+    ]
