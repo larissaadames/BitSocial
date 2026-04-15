@@ -10,29 +10,29 @@
 
     <header class="app-header">
         <div class="header-container">
-            <div class="logo-section">
+            <a href="index.html" class="logo-section logo-link" aria-label="Ir para a pagina inicial">
                 <span class="logo-text">Social</span>
                 <div class="logo-icon"></div>
-            </div>
+            </a>
             <div class="search-section">
-                <input type="text" placeholder="Pesquisar" class="search-bar">
+                <input type="text" id="search-bar" placeholder="Buscar" class="search-bar">
+                <div id="search-results" class="search-results"></div>
             </div>
-            <div class="user-section">
+            <a href="../perfil/perfil.html" class="user-section user-link" aria-label="Ir para o perfil">
                 <div class="header-user-avatar"></div>
-            </div>
+            </a>
         </div>
     </header>
 
     <main class="main-content">
         <div class="home-grid">
-            
             <nav class="nav-sidebar">
-                <div class="nav-item active">
-                    <span class="nav-icon">🏠</span>
-                    Página Inicial
-                </div>
+                <a href="index.html" class="nav-item nav-link active">
+                    <span class="nav-icon">&#127968;</span>
+                    Pagina Inicial
+                </a>
                 <div class="nav-item">
-                    <span class="nav-icon">🔖</span>
+                    <span class="nav-icon">&#128278;</span>
                     Salvos
                 </div>
                 <div class="nav-placeholder"></div>
@@ -40,20 +40,17 @@
             </nav>
 
             <section class="feed-section">
-                
                 <div class="create-post-card">
-                    <h2 class="post-prompt">> Qual foi o bug de hoje?</h2>
+                    <h2 class="post-prompt">&gt; Qual foi o bug de hoje?</h2>
                     <button class="btn-postar">Postar</button>
                 </div>
 
                 <div class="feed-scroll">
-                    
                     <article class="post-card">
                         <header class="post-header">
                             <div class="post-user-avatar"></div>
                             <span class="post-user-name">davi cagnato</span>
                         </header>
-                        
                         <div class="post-content-box">
                             <p class="post-text">
                                 alguem sabe como que faz pra debugar o codigo de python no intellij??? <br><br>
@@ -63,24 +60,23 @@
 
                         <footer class="post-footer">
                             <div class="post-votes">
-                                <span class="vote-arrow">↑</span>
+                                <span class="vote-arrow">&#8593;</span>
                                 <span class="vote-count">18</span>
-                                <span class="vote-arrow">↓</span>
+                                <span class="vote-arrow">&#8595;</span>
                             </div>
                             <div class="post-reactions">
                                 <span class="reaction-count">4</span>
-                                <span class="reaction-icon">💡</span>
+                                <span class="reaction-icon">&#128161;</span>
                             </div>
                         </footer>
                     </article>
 
                     <article class="post-card"></article>
-
                 </div>
             </section>
-
         </div>
     </main>
 
+    <script src="script.js"></script>
 </body>
 </html>

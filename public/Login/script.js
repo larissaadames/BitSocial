@@ -1,3 +1,28 @@
+const APP_BASE_URL = (() => {
+  const { protocol, hostname, port, origin } = window.location;
+  const isLocalhost = hostname === "127.0.0.1" || hostname === "localhost";
+
+  if (protocol === "file:") {
+    return "http://127.0.0.1:8000";
+  }
+
+  if (isLocalhost && port !== "8000") {
+    return "http://127.0.0.1:8000";
+  }
+
+  return origin;
+})();
+
+async function lerResposta(response) {
+  const texto = await response.text();
+
+  try {
+    return texto ? JSON.parse(texto) : {};
+  } catch {
+    return { detail: texto || "Erro inesperado no servidor." };
+  }
+}
+
 function togglePassword() {
   const input = document.getElementById("password");
 
@@ -13,27 +38,23 @@ function togglePassword() {
 const bg = document.querySelector(".bg-geo");
 
 window.addEventListener("mousemove", (e) => {
-  let x = e.clientX / window.innerWidth;
-  let y = e.clientY / window.innerHeight;
-  let moveX = (x - 0.5) * -40;
-  let moveY = (y - 0.5) * -40;
+  const x = e.clientX / window.innerWidth;
+  const y = e.clientY / window.innerHeight;
+  const moveX = (x - 0.5) * -40;
+  const moveY = (y - 0.5) * -40;
   bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
 });
 
-// Seleciona o formulário de login
 const loginForm = document.querySelector("form");
 
 loginForm.addEventListener("submit", async (event) => {
-  // Impede o envio padrão do HTML que recarrega a página
   event.preventDefault();
 
-  // Captura os valores dos inputs (certifique-se de que os IDs coincidem com seu HTML)
   const email = document.querySelector('input[type="email"]').value;
   const senha = document.querySelector('input[type="password"]').value;
 
   try {
-    // Envia os dados para a rota /login que criamos no main.py
-    const response = await fetch("/login", {
+    const response = await fetch(`${APP_BASE_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,29 +62,22 @@ loginForm.addEventListener("submit", async (event) => {
       body: JSON.stringify({ email: email, senha: senha }),
     });
 
-    const data = await response.json();
+    const data = await lerResposta(response);
 
     if (response.ok) {
-      // Se o status for 200 (Sucesso), redireciona o usuário
       console.log("Login bem-sucedido para:", data.username);
-
-      // Altere para o caminho da página que você deseja abrir após o login
-      window.location.href = "/public/perfil/perfil.html";
+      window.location.href = `${APP_BASE_URL}/public/perfil/perfil.html`;
     } else {
-      // Se o backend retornou erro (ex: 401), exibe a mensagem de erro
-      alert(
-        "Falha no login: " + (data.detail || "E-mail ou senha incorretos."),
-      );
+      alert("Falha no login: " + (data.detail || "E-mail ou senha incorretos."));
     }
   } catch (error) {
     console.error("Erro ao conectar com a API:", error);
-    alert("Erro no servidor. Verifique se o Uvicorn está rodando.");
+    alert("Erro no servidor. Verifique se o Uvicorn esta rodando.");
   }
 });
 
-// Coloca isso no início de cada página protegida
 const token = localStorage.getItem("token");
 
 if (!token) {
-  window.location.href = "/public/Login/login.html";
+  window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
 }

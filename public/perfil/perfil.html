@@ -10,22 +10,21 @@
 
     <header class="app-header">
         <div class="header-container">
-            <div class="logo-section">
+            <a href="../home/index.html" class="logo-section logo-link" aria-label="Ir para a pagina inicial">
                 <span class="logo-text">Social</span>
                 <div class="logo-icon"></div>
-            </div>
+            </a>
             <div class="search-section">
                 <input type="text" placeholder="Pesquisar" class="search-bar">
             </div>
-            <div class="user-section">
+            <a href="perfil.html" class="user-section user-link" aria-label="Ir para o perfil">
                 <div class="header-user-avatar" id="header-avatar"></div>
-            </div>
+            </a>
         </div>
     </header>
 
     <main class="main-content">
         <div class="profile-grid">
-            
             <section class="edit-section" id="edit-form">
                 <div class="form-group">
                     <label>Nome</label>
@@ -54,9 +53,9 @@
                     <div class="profile-avatar-big" id="avatar-display">
                         <div class="avatar-overlay">Alterar Foto</div>
                     </div>
-                    
+
                     <input type="file" id="profile-upload" accept="image/*" style="display: none;">
-                    
+
                     <div class="user-details" id="view-info">
                         <h1 class="display-name" id="display-name">Nome Sobrenome</h1>
                         <span class="user-handle" id="display-username">@username</span>
@@ -72,7 +71,6 @@
                 <article class="post-card"></article>
                 <article class="post-card"></article>
             </section>
-
         </div>
     </main>
 
