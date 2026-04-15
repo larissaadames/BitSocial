@@ -2,5 +2,5 @@
 const token = localStorage.getItem("token");
 
 if (!token) {
-  window.location.href = "/public/home/index.html";
+  window.location.href = "/public/Login/login.html";
 }

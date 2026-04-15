@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer
+import secrets
 
 # 1. Configuração do Banco de Dados
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:1234@localhost/socialbit"
@@ -83,6 +84,16 @@ async def cadastrar_usuario(usuario: CadastroUsuario, db: Session = Depends(get_
 
 # 6. 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# No login
+def criar_token(db, usuario_id):
+    token = secrets.token_hex(32)
+    # salva token + usuario_id no banco
+    return token
 
+# Validação
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 def get_current_user(token: str = Depends(oauth2_scheme)):
+    usuario = db.query(Usuario).filter(Usuario.token == token).first()
+    if not usuario:
+        raise HTTPException(status_code=401, detail="Não autorizado")
+    return usuario
