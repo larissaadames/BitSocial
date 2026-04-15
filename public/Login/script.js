@@ -75,3 +75,10 @@ loginForm.addEventListener("submit", async (event) => {
     alert("Erro no servidor. Verifique se o Uvicorn esta rodando.");
   }
 });
+
+// Coloca isso no início de cada página protegida
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "public/Login/login.html";
+}
