@@ -1,73 +1,91 @@
+// Lógica de URL dinâmica (Igual ao Login)
+const APP_BASE_URL = (() => {
+  const { protocol, hostname, port, origin } = window.location;
+  const isLocalhost = hostname === "127.0.0.1" || hostname === "localhost";
+  if (protocol === "file:") return "http://127.0.0.1:8000";
+  if (isLocalhost && port !== "8000") return "http://127.0.0.1:8000";
+  return origin;
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
-    const body = document.getElementById('app-body');
-    const btnAction = document.getElementById('btn-action');
-    const btnShowPassword = document.getElementById('btn-show-password');
-    const passwordFields = document.getElementById('password-fields');
-    const avatarDisplay = document.getElementById('avatar-display');
-    const profileUpload = document.getElementById('profile-upload');
+    const params = new URLSearchParams(window.location.search);
+    const targetUserId = params.get('id'); 
+    const loggedUserId = localStorage.getItem('userId');
 
-    // Validação de Senha (Regras do Cadastro)
-    const validarSenha = (senha) => {
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return regex.test(senha);
-    };
+    const userIdToFetch = targetUserId || loggedUserId;
 
-    /**
-     * Alternância entre Visualização e Edição
-     */
-    btnAction.addEventListener('click', () => {
-        if (body.classList.contains('editing-mode')) {
-            handleSave();
-        } else {
-            body.classList.add('editing-mode');
-            btnAction.textContent = "Salvar Alterações";
-        }
-    });
-
-    /**
-     * Controle da Seção de Senha
-     */
-    btnShowPassword.addEventListener('click', () => {
-        const isOpen = passwordFields.classList.toggle('show');
-        btnShowPassword.textContent = isOpen ? "Cancelar Alteração" : "Alterar Senha";
-    });
-
-    function handleSave() {
-        const newPass = document.getElementById('new-pass').value;
-        const confirmPass = document.getElementById('confirm-new-pass').value;
-
-        // Validação se o campo de senha estiver aberto
-        if (passwordFields.classList.contains('show') && newPass !== "") {
-            if (!validarSenha(newPass)) {
-                alert("A nova senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, um número e um símbolo.");
-                return;
-            }
-            if (newPass !== confirmPass) {
-                alert("As novas senhas não coincidem!");
-                return;
-            }
-        }
-
-        alert("Perfil atualizado com sucesso!");
-        body.classList.remove('editing-mode');
-        btnAction.textContent = "Editar Perfil";
-        passwordFields.classList.remove('show');
+    if (!userIdToFetch) {
+        window.location.href = "../Login/login.html";
+        return;
     }
 
-    /**
-     * Lógica de Foto de Perfil
-     */
-    avatarDisplay.addEventListener('click', () => profileUpload.click());
-    profileUpload.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                avatarDisplay.style.backgroundImage = `url(${e.target.result})`;
-                const headerAvatar = document.getElementById('header-avatar');
-                if (headerAvatar) headerAvatar.style.backgroundImage = `url(${e.target.result})`;
-            };
-            reader.readAsDataURL(file);
+    const btnEditar = document.querySelector('#btn-edit-perfil');
+    const btnSalvar = document.querySelector('#btn-save-perfil');
+    const displayNome = document.querySelector('#display-nome-completo');
+    const displayUsername = document.querySelector('#display-username');
+    const displayBio = document.querySelector('#display-bio');
+
+    // CARREGAR PERFIL (Read)
+    async function carregarPerfil() {
+        try {
+            const response = await fetch(`${APP_BASE_URL}/usuarios/${userIdToFetch}`);
+            if (!response.ok) throw new Error("Usuário não encontrado");
+
+            const usuario = await response.json();
+
+            displayNome.textContent = `${usuario.nome} ${usuario.sobrenome}`;
+            displayUsername.textContent = `@${usuario.username}`;
+            displayBio.textContent = usuario.bio || "> Olá, mundo! Bem-vindo ao meu perfil.";
+
+            document.querySelector('#edit-nome').value = usuario.nome;
+            document.querySelector('#edit-sobrenome').value = usuario.sobrenome;
+            document.querySelector('#edit-bio').value = usuario.bio || "";
+
+            // Só mostra o botão editar se for o SEU perfil
+            if (userIdToFetch == loggedUserId) {
+                btnEditar.style.display = 'block';
+            } else {
+                btnEditar.style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Erro ao carregar perfil:", error);
+        }
+    }
+
+    // ALTERNAR PARA MODO EDIÇÃO
+    btnEditar.addEventListener('click', () => {
+        document.getElementById('view-mode').style.display = 'none';
+        document.getElementById('edit-mode').style.display = 'flex';
+        btnEditar.style.display = 'none';
+    });
+
+    // SALVAR ALTERAÇÕES (Update)
+    btnSalvar.addEventListener('click', async () => {
+        const novosDados = {
+            id: parseInt(loggedUserId),
+            nome: document.querySelector('#edit-nome').value,
+            sobrenome: document.querySelector('#edit-sobrenome').value,
+            bio: document.querySelector('#edit-bio').value
+        };
+
+        try {
+            const response = await fetch(`${APP_BASE_URL}/usuarios/update`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(novosDados)
+            });
+
+            if (response.ok) {
+                alert("Perfil atualizado com sucesso!");
+                window.location.reload();
+            } else {
+                alert("Erro ao salvar alterações no servidor.");
+            }
+        } catch (error) {
+            console.error("Erro de conexão:", error);
+            alert("Erro de conexão com o servidor.");
         }
     });
+
+    carregarPerfil();
 });

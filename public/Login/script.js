@@ -35,15 +35,17 @@ function togglePassword() {
   }
 }
 
+// Animação do fundo geométrico
 const bg = document.querySelector(".bg-geo");
-
-window.addEventListener("mousemove", (e) => {
-  const x = e.clientX / window.innerWidth;
-  const y = e.clientY / window.innerHeight;
-  const moveX = (x - 0.5) * -40;
-  const moveY = (y - 0.5) * -40;
-  bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
-});
+if (bg) {
+    window.addEventListener("mousemove", (e) => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      const moveX = (x - 0.5) * -40;
+      const moveY = (y - 0.5) * -40;
+      bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    });
+}
 
 const loginForm = document.querySelector("form");
 
@@ -65,8 +67,18 @@ loginForm.addEventListener("submit", async (event) => {
     const data = await lerResposta(response);
 
     if (response.ok) {
-    localStorage.setItem("token", data.token);
-    window.location.href = `${APP_BASE_URL}/public/perfil/perfil.html`;
+        // --- MUDANÇAS AQUI: Persistindo a sessão para o Perfil e Home ---
+        
+        // Mantemos o token (caso a outra pessoa use)
+        if (data.token) localStorage.setItem("token", data.token);
+        
+        // Salvamos o ID e Username (essenciais para as rotas que criamos no main.py)
+        localStorage.setItem("userId", data.id);
+        localStorage.setItem("username", data.username);
+        
+        // Redirecionamento original mantido
+        window.location.href = `${APP_BASE_URL}/public/perfil/perfil.html`;
+        
     } else {
       alert("Falha no login: " + (data.detail || "E-mail ou senha incorretos."));
     }
@@ -75,9 +87,3 @@ loginForm.addEventListener("submit", async (event) => {
     alert("Erro no servidor. Verifique se o Uvicorn esta rodando.");
   }
 });
-
-// const token = localStorage.getItem("token");
-
-// if (!token) {
-//   window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
-// }

@@ -6,83 +6,67 @@
     <title>SocialBit - Perfil</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="dark-theme" id="app-body">
+<body class="dark-theme">
 
     <header class="app-header">
         <div class="header-container">
-            <a href="../home/index.html" class="logo-section logo-link" aria-label="Ir para a página inicial">
+            <a href="../home/index.html" class="logo-section">
                 <span class="logo-text">Social</span>
-                <img src="../img/bitLampada.png" alt="Bug BitSocial" class="logo-icon-img">
+                <img src="../img/bitLampada.png" alt="Logo BitSocial" class="logo-icon-img">
             </a>
             <div class="search-section">
-                <input type="text" placeholder="Pesquisar" class="search-bar">
+                <input type="text" placeholder="Pesquisar usuários..." class="search-bar" id="main-search">
             </div>
-            <a href="perfil.html" class="user-section user-link" aria-label="Ir para o perfil">
-                <div class="header-user-avatar" id="header-avatar"></div>
+            <a href="perfil.html" class="user-section">
+                <div class="header-user-avatar"></div>
             </a>
         </div>
     </header>
 
     <main class="main-content">
-        <div class="profile-grid">
+        <div class="profile-container">
             
-            <section class="edit-section" id="edit-form">
-                <h2 class="section-title">Editar Perfil</h2>
-                <div class="form-group">
-                    <label>Nome</label>
-                    <input type="text" class="edit-input" id="input-nome" placeholder="Nome">
-                </div>
-                <div class="form-group">
-                    <label>Sobrenome</label>
-                    <input type="text" class="edit-input" id="input-sobrenome" placeholder="Sobrenome">
-                </div>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" class="edit-input" id="input-user" placeholder="Username">
-                </div>
-
-                <div class="password-security-section">
-                    <button type="button" class="btn-outline" id="btn-show-password">Alterar Senha</button>
+            <section class="profile-card">
+                <div class="profile-header-main">
+                    <div class="profile-avatar-large" id="display-avatar"></div>
                     
-                    <div id="password-fields" class="hidden-fields">
-                        <div class="form-group">
-                            <label>Senha Atual</label>
-                            <input type="password" class="edit-input" id="current-pass" placeholder="Senha atual">
+                    <div class="profile-view-mode" id="view-mode">
+                        <h1 id="display-nome-completo">Carregando...</h1>
+                        <p id="display-username">@usuario</p>
+                        
+                        <div class="bio-container">
+                            <p id="display-bio">> Olá, mundo! Bem-vindo ao meu perfil.</p>
                         </div>
-                        <div class="form-group">
-                            <label>Nova Senha</label>
-                            <input type="password" class="edit-input" id="new-pass" placeholder="Nova senha">
-                            <small class="helper-text">Mín. 8 caracteres, com maiúscula, número e símbolo.</small>
+
+                        <button id="btn-edit-perfil" class="btn-edit">Editar Perfil</button>
+                    </div>
+
+                    <div class="profile-edit-mode" id="edit-mode">
+                        <h2 class="edit-title">Editar Informações</h2>
+                        
+                        <div class="edit-group">
+                            <label for="edit-nome">Nome</label>
+                            <input type="text" id="edit-nome" placeholder="Seu nome">
                         </div>
-                        <div class="form-group">
-                            <label>Confirmar Nova Senha</label>
-                            <input type="password" class="edit-input" id="confirm-new-pass" placeholder="Confirmar nova senha">
+
+                        <div class="edit-group">
+                            <label for="edit-sobrenome">Sobrenome</label>
+                            <input type="text" id="edit-sobrenome" placeholder="Seu sobrenome">
+                        </div>
+
+                        <div class="edit-group">
+                            <label for="edit-bio">Bio (Biografia)</label>
+                            <textarea id="edit-bio" rows="4" placeholder="Fale um pouco sobre você ou seus bugs favoritos..."></textarea>
+                        </div>
+
+                        <div class="edit-actions">
+                            <button id="btn-save-perfil" class="btn-save">Salvar Alterações</button>
+                            <button onclick="window.location.reload()" class="btn-cancel">Cancelar</button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <aside class="sidebar">
-                <div class="sticky-wrapper">
-                    <div class="profile-avatar-big" id="avatar-display">
-                        <div class="avatar-overlay">Trocar Foto</div>
-                    </div>
-                    <input type="file" id="profile-upload" accept="image/*" style="display: none;">
-                    
-                    <div class="user-details" id="view-info">
-                        <h1 class="display-name" id="display-name-view">Nome Sobrenome</h1>
-                        <span class="user-handle" id="display-username-view">@username</span>
-                    </div>
-
-                    <button class="btn-primary" id="btn-action">Editar Perfil</button>
-                </div>
-            </aside>
-
-            <section class="feed" id="posts-feed">
-                <article class="post-card"></article>
-                <article class="post-card"></article>
-                <article class="post-card"></article>
-            </section>
         </div>
     </main>
 
