@@ -1,17 +1,33 @@
-/* --- RESET --- */
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+/* 1. Importação da Fonte e Variáveis Globais */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
+
+:root {
+  --bg-color: #0d0d0d;
+  --card-bg: #1e1e1ee6;
+  --input-bg: #d9d9d9;
+  --accent-purple: #7b2ff7;
+  --text-white: #ffffff;
+  --text-label: #a0a0a0;
+}
+
+/* 2. Reset e Configurações de Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Orbitron", sans-serif;
+}
 
 body.dark-theme {
-    background-color: #000;
-    color: #fff;
-    min-height: 100vh;
+    background: radial-gradient(ellipse at 80% 60%, #1e1230 0%, #111 55%, #0a0a0a 100%);
+    color: var(--text-white);
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-/* HEADER */
+/* --- CABEÇALHO --- */
 .app-header {
     background-color: #121212;
     border-bottom: 1px solid #222;
@@ -29,166 +45,77 @@ body.dark-theme {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
 }
 
-.logo-section, .user-section { display: flex; align-items: center; }
-.logo-link, .user-link { text-decoration: none; color: inherit; }
-.user-link { flex-shrink: 0; }
-.logo-text { font-size: 22px; font-weight: 800; }
-.search-section { flex: 1; max-width: 360px; margin: 0 20px; }
-.search-bar { background-color: #262626; border: none; border-radius: 8px; padding: 10px 15px; color: #fff; width: 100%; outline: none; }
+.logo-section { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.logo-text { font-size: 26px; font-weight: 900; color: var(--text-white); letter-spacing: -1px; }
+.logo-icon-img { height: 38px; width: auto; filter: drop-shadow(0 0 5px rgba(123, 47, 247, 0.5)); }
+
+.search-bar {
+    background-color: #262626;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #fff;
+    width: 300px;
+    outline: none;
+}
+
 .header-user-avatar { width: 35px; height: 35px; background-color: #D9D9D9; border-radius: 50%; background-size: cover; }
 
-/* GRID E LAYOUT */
+/* --- LAYOUT --- */
 .main-content { flex-grow: 1; width: 100%; max-width: 1100px; margin: 0 auto; height: 100%; padding: 0 20px; }
+.profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 40px; height: 100%; transition: 0.3s; }
 
-.profile-grid {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 40px;
-    height: 100%;
-    transition: all 0.3s ease-in-out;
-}
-
-/* SIDEBAR */
+/* --- SIDEBAR --- */
 .sidebar { padding-top: 40px; }
 .sticky-wrapper { position: sticky; top: 40px; display: flex; flex-direction: column; align-items: center; }
 
 .profile-avatar-big {
-    width: 180px; height: 180px;
-    background-color: #D9D9D9;
-    border-radius: 50%;
-    margin-bottom: 20px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
+    width: 180px; height: 180px; background-color: #262626; border-radius: 50%; margin-bottom: 20px;
+    cursor: pointer; position: relative; overflow: hidden; background-size: cover; background-position: center;
 }
-
 .avatar-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    display: flex; justify-content: center; align-items: center;
-    font-size: 14px; font-weight: 600;
-    opacity: 0; transition: 0.3s;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+    display: flex; justify-content: center; align-items: center; font-size: 14px; opacity: 0; transition: 0.3s;
 }
-
 .profile-avatar-big:hover .avatar-overlay { opacity: 1; }
 
 .user-details { text-align: center; margin-bottom: 25px; }
 .display-name { font-size: 20px; font-weight: 700; }
 .user-handle { color: #777; font-size: 14px; }
 
-.btn-main {
-    width: 100%; background-color: #262626; color: #fff;
-    border: 1px solid #333; padding: 12px; border-radius: 8px;
-    cursor: pointer; font-weight: 600; transition: 0.2s;
+/* --- BOTÕES --- */
+.btn-primary {
+    width: 100%; background-color: var(--accent-purple); color: #fff; border: none; padding: 12px;
+    border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s;
 }
+.btn-primary:hover { background-color: #6a2ee0; }
 
-/* FORMULÁRIO E FEED */
+.btn-outline {
+    background: transparent; border: 1px solid #444; color: #aaa; padding: 10px;
+    border-radius: 6px; cursor: pointer; margin-bottom: 15px; width: 100%; transition: 0.2s;
+}
+.btn-outline:hover { border-color: var(--accent-purple); color: #fff; }
+
+/* --- EDIÇÃO --- */
 .edit-section { display: none; padding-top: 40px; flex-direction: column; gap: 15px; }
+.section-title { font-size: 18px; margin-bottom: 10px; color: var(--accent-purple); }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
-.edit-input { background-color: #262626; border: 1px solid #333; border-radius: 6px; padding: 12px; color: #fff; outline: none; }
+.edit-input { background-color: var(--input-bg); border: none; border-radius: 8px; padding: 12px; color: #1a1a1a; outline: none; }
+.helper-text { font-size: 11px; color: #777; }
 
-.feed { padding: 40px 0; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; height: 100%; scrollbar-width: none; }
+.hidden-fields { display: none; flex-direction: column; gap: 15px; padding: 15px; border-radius: 8px; background: #0a0a0a; border: 1px solid #1a1a1a; }
+.hidden-fields.show { display: flex; }
+
+/* --- FEED --- */
+.feed { padding: 40px 0; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; scrollbar-width: none; }
 .feed::-webkit-scrollbar { display: none; }
-.post-card { background-color: #121212; border: 1px solid #222; border-radius: 12px; width: 100%; min-height: 380px; flex-shrink: 0; }
+.post-card { background-color: #121212; border: 1px solid #222; border-radius: 12px; min-height: 380px; flex-shrink: 0; }
 
-/* --- LÓGICA DE MODO EDIÇÃO --- */
+/* --- LOGICA DE TROCA --- */
 body.editing-mode .feed, body.editing-mode .user-details { display: none; }
 body.editing-mode .edit-section { display: flex; }
-
-body.editing-mode .profile-grid {
-    grid-template-columns: 1fr 300px; /* Form na esquerda, Foto na direita */
-}
-
+body.editing-mode .profile-grid { grid-template-columns: 1fr 300px; }
 body.editing-mode .sidebar { order: 2; }
-
-body.editing-mode .btn-main {
-    background-color: #fff;
-    color: #000;
-}
-
-@media (max-width: 900px) {
-    body.dark-theme {
-        height: auto;
-        overflow-y: auto;
-    }
-
-    .app-header {
-        height: auto;
-        padding: 16px;
-    }
-
-    .header-container {
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .search-section {
-        order: 3;
-        flex-basis: 100%;
-        max-width: none;
-        margin: 0;
-    }
-
-    .main-content {
-        height: auto;
-        padding: 0 16px 24px;
-    }
-
-    .profile-grid,
-    body.editing-mode .profile-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-        height: auto;
-    }
-
-    .sidebar {
-        order: -1;
-        padding-top: 24px;
-    }
-
-    .sticky-wrapper {
-        position: static;
-    }
-
-    .edit-section {
-        padding-top: 0;
-    }
-
-    .feed {
-        padding: 0 0 24px;
-        height: auto;
-        overflow: visible;
-    }
-
-    body.editing-mode .sidebar {
-        order: -1;
-    }
-}
-
-@media (max-width: 480px) {
-    .app-header {
-        padding: 12px;
-    }
-
-    .main-content {
-        padding: 0 12px 20px;
-    }
-
-    .profile-avatar-big {
-        width: 140px;
-        height: 140px;
-    }
-
-    .display-name {
-        font-size: 18px;
-    }
-
-    .post-card {
-        min-height: 260px;
-    }
-}
+body.editing-mode .btn-primary { background-color: #fff; color: #000; }

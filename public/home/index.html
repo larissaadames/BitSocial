@@ -3,37 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social - Home</title>
+    <title>SocialBit - Home</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark-theme">
 
     <header class="app-header">
         <div class="header-container">
-            <a href="index.html" class="logo-section logo-link" aria-label="Ir para a pagina inicial">
+            <a href="index.html" class="logo-section logo-link">
                 <span class="logo-text">Social</span>
-                <div class="logo-icon"></div>
+                <img src="../img/bitLampada.png" alt="Bug BitSocial" class="logo-icon-img">
             </a>
             <div class="search-section">
-                <input type="text" id="search-bar" placeholder="Buscar" class="search-bar">
-                <div id="search-results" class="search-results"></div>
+                <input type="text" placeholder="Pesquisar" class="search-bar">
             </div>
-            <a href="../perfil/perfil.html" class="user-section user-link" aria-label="Ir para o perfil">
-                <div class="header-user-avatar"></div>
+            <a href="../perfil/perfil.html" class="user-section user-link">
+                <div class="header-user-avatar" id="header-avatar"></div>
             </a>
         </div>
     </header>
 
     <main class="main-content">
         <div class="home-grid">
+            
             <nav class="nav-sidebar">
-                <a href="index.html" class="nav-item nav-link active">
-                    <span class="nav-icon">&#127968;</span>
-                    Pagina Inicial
-                </a>
-                <div class="nav-item">
-                    <span class="nav-icon">&#128278;</span>
-                    Salvos
+                <div class="nav-item active" data-target="home">
+                    <span class="nav-icon">🏠</span> Página Inicial
+                </div>
+                <div class="nav-item" data-target="saved">
+                    <span class="nav-icon">🔖</span> Salvos
                 </div>
                 <div class="nav-placeholder"></div>
                 <div class="nav-placeholder"></div>
@@ -41,7 +39,7 @@
 
             <section class="feed-section">
                 <div class="create-post-card">
-                    <h2 class="post-prompt">&gt; Qual foi o bug de hoje?</h2>
+                    <h2 class="post-prompt">> Qual foi o bug de hoje?</h2>
                     <button class="btn-postar">Postar</button>
                 </div>
 
@@ -51,27 +49,27 @@
                             <div class="post-user-avatar"></div>
                             <span class="post-user-name">davi cagnato</span>
                         </header>
+                        
                         <div class="post-content-box">
                             <p class="post-text">
-                                alguem sabe como que faz pra debugar o codigo de python no intellij??? <br><br>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                Alguém sabe como que faz pra debugar o código de python no IntelliJ??? <br><br>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                             </p>
                         </div>
 
                         <footer class="post-footer">
                             <div class="post-votes">
-                                <span class="vote-arrow">&#8593;</span>
-                                <span class="vote-count">18</span>
-                                <span class="vote-arrow">&#8595;</span>
+                                <div class="vote-arrow upvote" aria-label="Upvote"></div>
+                                <span class="vote-count">0</span>
+                                <div class="vote-arrow downvote" aria-label="Downvote"></div>
                             </div>
                             <div class="post-reactions">
                                 <span class="reaction-count">4</span>
-                                <span class="reaction-icon">&#128161;</span>
+                                <span class="reaction-icon">💡</span>
                             </div>
+
                         </footer>
                     </article>
-
-                    <article class="post-card"></article>
                 </div>
             </section>
         </div>

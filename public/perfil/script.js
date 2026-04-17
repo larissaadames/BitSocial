@@ -1,62 +1,73 @@
 document.addEventListener('DOMContentLoaded', () => {
     const body = document.getElementById('app-body');
     const btnAction = document.getElementById('btn-action');
+    const btnShowPassword = document.getElementById('btn-show-password');
+    const passwordFields = document.getElementById('password-fields');
     const avatarDisplay = document.getElementById('avatar-display');
     const profileUpload = document.getElementById('profile-upload');
-    const headerAvatar = document.getElementById('header-avatar');
+
+    // Validação de Senha (Regras do Cadastro)
+    const validarSenha = (senha) => {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return regex.test(senha);
+    };
 
     /**
-     * Controle do Botão Principal (Editar / Salvar)
+     * Alternância entre Visualização e Edição
      */
     btnAction.addEventListener('click', () => {
-        const isCurrentlyEditing = body.classList.contains('editing-mode');
-
-        if (isCurrentlyEditing) {
-            // LÓGICA DE SALVAR
-            saveProfile();
+        if (body.classList.contains('editing-mode')) {
+            handleSave();
         } else {
-            // LÓGICA DE ENTRAR NA EDIÇÃO
-            enterEditMode();
+            body.classList.add('editing-mode');
+            btnAction.textContent = "Salvar Alterações";
         }
     });
 
-    function enterEditMode() {
-        body.classList.add('editing-mode');
-        btnAction.textContent = "Salvar Alterações";
-    }
+    /**
+     * Controle da Seção de Senha
+     */
+    btnShowPassword.addEventListener('click', () => {
+        const isOpen = passwordFields.classList.toggle('show');
+        btnShowPassword.textContent = isOpen ? "Cancelar Alteração" : "Alterar Senha";
+    });
 
-    function saveProfile() {
-        // 1. Simulação de processamento de dados
-        console.log("Salvando informações no banco de dados...");
+    function handleSave() {
+        const newPass = document.getElementById('new-pass').value;
+        const confirmPass = document.getElementById('confirm-new-pass').value;
 
-        // 2. Feedback ao usuário
-        alert("Alterações salvas com sucesso!");
+        // Validação se o campo de senha estiver aberto
+        if (passwordFields.classList.contains('show') && newPass !== "") {
+            if (!validarSenha(newPass)) {
+                alert("A nova senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, um número e um símbolo.");
+                return;
+            }
+            if (newPass !== confirmPass) {
+                alert("As novas senhas não coincidem!");
+                return;
+            }
+        }
 
-        // 3. O PASSO QUE VOCÊ PEDIU: Voltar para o modo de visualização
+        alert("Perfil atualizado com sucesso!");
         body.classList.remove('editing-mode');
         btnAction.textContent = "Editar Perfil";
+        passwordFields.classList.remove('show');
     }
 
     /**
-     * Lógica de Troca de Foto
+     * Lógica de Foto de Perfil
      */
-    avatarDisplay.addEventListener('click', () => {
-        profileUpload.click();
-    });
-
+    avatarDisplay.addEventListener('click', () => profileUpload.click());
     profileUpload.addEventListener('change', function() {
         const file = this.files[0];
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const imageUrl = `url(${e.target.result})`;
-                avatarDisplay.style.backgroundImage = imageUrl;
-                if (headerAvatar) {
-                    headerAvatar.style.backgroundImage = imageUrl;
-                }
+                avatarDisplay.style.backgroundImage = `url(${e.target.result})`;
+                const headerAvatar = document.getElementById('header-avatar');
+                if (headerAvatar) headerAvatar.style.backgroundImage = `url(${e.target.result})`;
             };
             reader.readAsDataURL(file);
         }
     });
 });
-

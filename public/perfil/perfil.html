@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social - Perfil</title>
+    <title>SocialBit - Perfil</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark-theme" id="app-body">
 
     <header class="app-header">
         <div class="header-container">
-            <a href="../home/index.html" class="logo-section logo-link" aria-label="Ir para a pagina inicial">
+            <a href="../home/index.html" class="logo-section logo-link" aria-label="Ir para a página inicial">
                 <span class="logo-text">Social</span>
-                <div class="logo-icon"></div>
+                <img src="../img/bitLampada.png" alt="Bug BitSocial" class="logo-icon-img">
             </a>
             <div class="search-section">
                 <input type="text" placeholder="Pesquisar" class="search-bar">
@@ -25,7 +25,9 @@
 
     <main class="main-content">
         <div class="profile-grid">
+            
             <section class="edit-section" id="edit-form">
+                <h2 class="section-title">Editar Perfil</h2>
                 <div class="form-group">
                     <label>Nome</label>
                     <input type="text" class="edit-input" id="input-nome" placeholder="Nome">
@@ -38,35 +40,45 @@
                     <label>Username</label>
                     <input type="text" class="edit-input" id="input-user" placeholder="Username">
                 </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" class="edit-input" placeholder="Nova senha">
-                </div>
-                <div class="form-group">
-                    <label>Confirmar senha</label>
-                    <input type="password" class="edit-input" placeholder="Confirmar senha">
+
+                <div class="password-security-section">
+                    <button type="button" class="btn-outline" id="btn-show-password">Alterar Senha</button>
+                    
+                    <div id="password-fields" class="hidden-fields">
+                        <div class="form-group">
+                            <label>Senha Atual</label>
+                            <input type="password" class="edit-input" id="current-pass" placeholder="Senha atual">
+                        </div>
+                        <div class="form-group">
+                            <label>Nova Senha</label>
+                            <input type="password" class="edit-input" id="new-pass" placeholder="Nova senha">
+                            <small class="helper-text">Mín. 8 caracteres, com maiúscula, número e símbolo.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmar Nova Senha</label>
+                            <input type="password" class="edit-input" id="confirm-new-pass" placeholder="Confirmar nova senha">
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <aside class="sidebar">
                 <div class="sticky-wrapper">
                     <div class="profile-avatar-big" id="avatar-display">
-                        <div class="avatar-overlay">Alterar Foto</div>
+                        <div class="avatar-overlay">Trocar Foto</div>
                     </div>
-
                     <input type="file" id="profile-upload" accept="image/*" style="display: none;">
-
+                    
                     <div class="user-details" id="view-info">
-                        <h1 class="display-name" id="display-name">Nome Sobrenome</h1>
-                        <span class="user-handle" id="display-username">@username</span>
+                        <h1 class="display-name" id="display-name-view">Nome Sobrenome</h1>
+                        <span class="user-handle" id="display-username-view">@username</span>
                     </div>
 
-                    <button class="btn-main" id="btn-action">Editar Perfil</button>
+                    <button class="btn-primary" id="btn-action">Editar Perfil</button>
                 </div>
             </aside>
 
             <section class="feed" id="posts-feed">
-                <article class="post-card"></article>
                 <article class="post-card"></article>
                 <article class="post-card"></article>
                 <article class="post-card"></article>
