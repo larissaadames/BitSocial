@@ -15,7 +15,8 @@
                 <img src="../img/bitLampada.png" alt="Bug BitSocial" class="logo-icon-img">
             </a>
             <div class="search-section">
-                <input type="text" placeholder="Pesquisar" class="search-bar">
+                <input type="text" placeholder="Pesquisar usuários..." class="search-bar" id="main-search">
+                <div class="search-results" id="search-results"></div>
             </div>
             <a href="../perfil/perfil.html" class="user-section user-link">
                 <div class="header-user-avatar" id="header-avatar"></div>
@@ -38,38 +39,30 @@
             </nav>
 
             <section class="feed-section">
-                <div class="create-post-card">
-                    <h2 class="post-prompt">> Qual foi o bug de hoje?</h2>
-                    <button class="btn-postar">Postar</button>
+                <div class="create-post-card" id="create-post-card">
+                    <div class="create-post-top">
+                        <h2 class="post-prompt">> Qual foi o bug de hoje?</h2>
+                        <button class="btn-postar" id="btn-toggle-post" type="button">Postar</button>
+                    </div>
+
+                    <form class="post-composer is-hidden" id="post-composer-form">
+                        <textarea
+                            id="post-content"
+                            class="composer-input"
+                            maxlength="500"
+                            placeholder="Compartilhe seu bug, dica ou duvida com a comunidade..."
+                        ></textarea>
+
+                        <div class="composer-actions">
+                            <span class="composer-counter" id="post-counter">0/500</span>
+                            <button class="btn-cancel-post" id="btn-cancel-post" type="button">Cancelar</button>
+                            <button class="btn-send-post" id="btn-send-post" type="submit">Publicar</button>
+                        </div>
+                    </form>
                 </div>
 
-                <div class="feed-scroll">
-                    <article class="post-card">
-                        <header class="post-header">
-                            <div class="post-user-avatar"></div>
-                            <span class="post-user-name">davi cagnato</span>
-                        </header>
-                        
-                        <div class="post-content-box">
-                            <p class="post-text">
-                                Alguém sabe como que faz pra debugar o código de python no IntelliJ??? <br><br>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                            </p>
-                        </div>
-
-                        <footer class="post-footer">
-                            <div class="post-votes">
-                                <div class="vote-arrow upvote" aria-label="Upvote"></div>
-                                <span class="vote-count">0</span>
-                                <div class="vote-arrow downvote" aria-label="Downvote"></div>
-                            </div>
-                            <div class="post-reactions">
-                                <span class="reaction-count">4</span>
-                                <span class="reaction-icon">💡</span>
-                            </div>
-
-                        </footer>
-                    </article>
+                <div class="feed-scroll" id="feed-scroll">
+                    <p class="feed-loading">Carregando posts...</p>
                 </div>
             </section>
         </div>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SocialBit - Perfil</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260419b">
 </head>
 <body class="dark-theme">
 
@@ -16,6 +16,7 @@
             </a>
             <div class="search-section">
                 <input type="text" placeholder="Pesquisar usuários..." class="search-bar" id="main-search">
+                <div class="search-results" id="search-results"></div>
             </div>
             <a href="perfil.html" class="user-section">
                 <div class="header-user-avatar"></div>
@@ -67,9 +68,26 @@
                 </div>
             </section>
 
+            <section class="profile-content-card">
+                <nav class="profile-tabs" id="profile-tabs">
+                    <button class="profile-tab active" data-tab="overview" type="button">Overview</button>
+                    <button class="profile-tab" data-tab="posts" type="button">Posts</button>
+                    <button class="profile-tab" data-tab="saved" type="button">Saved</button>
+                </nav>
+
+                <div class="profile-toolbar">
+                    <a href="../home/index.html" class="btn-create-post is-hidden" id="btn-create-post" hidden aria-hidden="true" style="display: none;">+ Create Post</a>
+                    <p class="profile-feed-caption" id="profile-feed-caption">Mostrando posts recentes</p>
+                </div>
+
+                <div class="profile-posts-list" id="profile-posts-list">
+                    <p class="profile-loading">Carregando posts...</p>
+                </div>
+            </section>
+
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=20260419b"></script>
 </body>
 </html>

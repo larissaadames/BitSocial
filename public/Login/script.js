@@ -69,8 +69,9 @@ loginForm.addEventListener("submit", async (event) => {
     if (response.ok) {
         // --- MUDANÇAS AQUI: Persistindo a sessão para o Perfil e Home ---
         
-        // Mantemos o token (caso a outra pessoa use)
-        if (data.token) localStorage.setItem("token", data.token);
+      // Mantemos o token para ações autenticadas no feed.
+      const accessToken = data.access_token || data.token;
+      if (accessToken) localStorage.setItem("token", accessToken);
         
         // Salvamos o ID e Username (essenciais para as rotas que criamos no main.py)
         localStorage.setItem("userId", data.id);

@@ -7,6 +7,42 @@
   font-family: "Orbitron", sans-serif;
 }
 
+/* Acessibilidade de toque */
+button,
+input,
+.forgot-password {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(123, 47, 247, 0.2);
+}
+
+@media (pointer: coarse) {
+  .input-group input {
+    min-height: 44px;
+  }
+
+  .btn {
+    min-height: 44px;
+  }
+
+  .password-field input {
+    padding-right: 52px;
+  }
+
+  .password-field button {
+    width: 40px;
+    height: 40px;
+    right: 6px;
+    border-radius: 8px;
+    justify-content: center;
+  }
+
+  .forgot-password {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+}
+
 body {
     background: radial-gradient(ellipse at 80% 60%, #1e1230 0%, #111 55%, #0a0a0a 100%);
     color: var(--text-white);
@@ -259,6 +295,10 @@ input[type="password"] { font-family: "Segoe UI", sans-serif; }
     align-items: flex-start;
   }
 
+  .bg-geo {
+    opacity: 0.82;
+  }
+
   .login-container {
     padding: 32px 24px;
     border-radius: 20px;
@@ -308,5 +348,143 @@ input[type="password"] { font-family: "Segoe UI", sans-serif; }
   .btn {
     padding: 13px;
     font-size: 1rem;
+  }
+
+  .bg-geo {
+    top: -18%;
+    left: -16%;
+    width: 132%;
+    height: 132%;
+    opacity: 0.7;
+  }
+
+  .b8,
+  .b9 {
+    opacity: 0.45;
+  }
+}
+
+@media (max-width: 360px) {
+  body {
+    padding: 12px 8px 18px;
+  }
+
+  .login-container {
+    padding: 20px 12px;
+    border-radius: 14px;
+  }
+
+  .title {
+    font-size: 1.7rem;
+    margin-bottom: 18px;
+  }
+
+  .content {
+    gap: 18px;
+  }
+
+  .illustration {
+    max-width: 180px;
+    margin: 0 auto;
+  }
+
+  .input-group {
+    margin-bottom: 14px;
+  }
+
+  .input-group input {
+    padding: 12px 10px;
+    font-size: 0.8rem;
+  }
+
+  .forgot-password {
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+
+  .separator {
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+
+  .bg-geo {
+    opacity: 0.62;
+  }
+
+  .b7,
+  .b8,
+  .b9 {
+    opacity: 0.22;
+  }
+}
+
+@media (max-width: 320px) {
+  body {
+    padding: 10px 6px 14px;
+  }
+
+  .login-container {
+    padding: 16px 10px;
+    border-radius: 12px;
+  }
+
+  .title {
+    font-size: 1.45rem;
+    margin-bottom: 14px;
+  }
+
+  .content {
+    gap: 14px;
+  }
+
+  .illustration {
+    max-width: 150px;
+  }
+
+  .input-group {
+    margin-bottom: 12px;
+  }
+
+  .input-group label,
+  .forgot-password {
+    font-size: 0.72rem;
+  }
+
+  .input-group input {
+    padding: 10px 9px;
+    font-size: 0.78rem;
+  }
+
+  .password-field button {
+    right: 8px;
+    font-size: 14px;
+  }
+
+  .forgot-password {
+    margin-bottom: 14px;
+  }
+
+  .btn {
+    padding: 11px;
+    font-size: 0.88rem;
+  }
+
+  .separator {
+    margin: 12px 0;
+    font-size: 0.85rem;
+  }
+
+  .bg-geo {
+    opacity: 0.5;
+  }
+
+  .b7,
+  .b8,
+  .b9 {
+    display: none;
   }
 }

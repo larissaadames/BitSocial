@@ -18,6 +18,42 @@
   font-family: "Orbitron", sans-serif;
 }
 
+/* Acessibilidade de toque */
+button,
+input,
+.login-link a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(123, 47, 247, 0.2);
+}
+
+@media (pointer: coarse) {
+  input {
+    min-height: 44px;
+  }
+
+  .btn-submit {
+    min-height: 44px;
+  }
+
+  .password-field input {
+    padding-right: 52px;
+  }
+
+  .password-field button {
+    width: 40px;
+    height: 40px;
+    right: 6px;
+    border-radius: 8px;
+    justify-content: center;
+  }
+
+  .login-link a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+}
+
 /* FUNDO GEOMÉTRICO — substitua o body::before e body::after antigos */
 
 body {
@@ -401,6 +437,10 @@ input[type="password"] {
     align-items: flex-start;
   }
 
+  .bg-geo {
+    opacity: 0.85;
+  }
+
   .registration-card {
     flex-direction: column;
     padding: 40px 24px;
@@ -423,6 +463,21 @@ input[type="password"] {
   h1 {
     font-size: 2.5rem;
     text-align: center;
+  }
+}
+
+@media (max-width: 780px) {
+  .registration-card {
+    padding: 30px 18px;
+    gap: 22px;
+  }
+
+  .img-character {
+    max-width: 260px;
+  }
+
+  .btn-submit {
+    margin-top: 18px;
   }
 }
 
@@ -464,6 +519,85 @@ input[type="password"] {
     padding: 16px;
     font-size: 1rem;
   }
+
+  .bg-geo {
+    top: -18%;
+    left: -16%;
+    width: 132%;
+    height: 132%;
+    opacity: 0.72;
+  }
+
+  .b8,
+  .b9 {
+    opacity: 0.45;
+  }
+}
+
+@media (max-width: 360px) {
+  body {
+    padding: 12px 8px 18px;
+  }
+
+  .registration-card {
+    padding: 18px 10px;
+    border-radius: 16px;
+    gap: 16px;
+  }
+
+  .illustrations-side {
+    gap: 10px;
+  }
+
+  .img-character {
+    max-width: 170px;
+  }
+
+  h1 {
+    font-size: 1.65rem;
+    margin-bottom: 14px;
+  }
+
+  .form-grid {
+    gap: 10px;
+  }
+
+  label {
+    font-size: 0.72rem;
+  }
+
+  input {
+    padding: 11px 12px;
+    font-size: 0.85rem;
+  }
+
+  .btn-submit {
+    padding: 13px;
+    font-size: 0.95rem;
+    margin-top: 14px;
+  }
+
+  .login-link {
+    margin-top: 12px;
+  }
+
+  .login-link a {
+    font-size: 0.8rem;
+  }
+
+  .password-checklist {
+    font-size: 0.7rem;
+  }
+
+  .bg-geo {
+    opacity: 0.62;
+  }
+
+  .b7,
+  .b8,
+  .b9 {
+    opacity: 0.22;
+  }
 }
 
 /* NOVA LÓGICA: Asterisco em campos obrigatórios */
@@ -485,4 +619,81 @@ input[type="password"] {
 .password-checklist li {
   color: var(--text-label);
   transition: color 0.3s;
+}
+
+@media (max-width: 320px) {
+  body {
+    padding: 10px 6px 14px;
+  }
+
+  .registration-card {
+    padding: 14px 8px;
+    border-radius: 14px;
+    gap: 14px;
+  }
+
+  .illustrations-side {
+    gap: 8px;
+  }
+
+  .img-character {
+    max-width: 140px;
+  }
+
+  h1 {
+    font-size: 1.45rem;
+    margin-bottom: 10px;
+  }
+
+  .form-grid {
+    gap: 8px;
+  }
+
+  .input-group {
+    gap: 4px;
+  }
+
+  label {
+    font-size: 0.68rem;
+  }
+
+  input {
+    padding: 9px 10px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .password-field button {
+    right: 8px;
+    font-size: 14px;
+  }
+
+  .btn-submit {
+    padding: 11px;
+    font-size: 0.9rem;
+    margin-top: 12px;
+  }
+
+  .login-link {
+    margin-top: 10px;
+  }
+
+  .login-link a {
+    font-size: 0.75rem;
+  }
+
+  .password-checklist {
+    font-size: 0.66rem;
+    padding-left: 2px;
+  }
+
+  .bg-geo {
+    opacity: 0.5;
+  }
+
+  .b7,
+  .b8,
+  .b9 {
+    display: none;
+  }
 }
