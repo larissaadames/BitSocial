@@ -11,9 +11,7 @@ from urllib.parse import quote_plus
 
 
 # 1. Configuração do Banco de Dados
-senha_secreta = quote_plus("PUC@1234")
-
-SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://root:{senha_secreta}@localhost/socialbit"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:PUC%401234@localhost/socialbit"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
