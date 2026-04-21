@@ -1,91 +1,126 @@
-// Lógica de URL dinâmica (Igual ao Login)
-const APP_BASE_URL = (() => {
-  const { protocol, hostname, port, origin } = window.location;
-  const isLocalhost = hostname === "127.0.0.1" || hostname === "localhost";
-  if (protocol === "file:") return "http://127.0.0.1:8000";
-  if (isLocalhost && port !== "8000") return "http://127.0.0.1:8000";
-  return origin;
-})();
+const APP_BASE_URL = "http://127.0.0.1:8000";
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const targetUserId = params.get('id'); 
     const loggedUserId = localStorage.getItem('userId');
-
     const userIdToFetch = targetUserId || loggedUserId;
 
-    if (!userIdToFetch) {
+    if (!userIdToFetch || userIdToFetch === "null") {
         window.location.href = "../Login/login.html";
         return;
     }
 
-    const btnEditar = document.querySelector('#btn-edit-perfil');
-    const btnSalvar = document.querySelector('#btn-save-perfil');
-    const displayNome = document.querySelector('#display-nome-completo');
-    const displayUsername = document.querySelector('#display-username');
-    const displayBio = document.querySelector('#display-bio');
+    // --- 1. LÓGICA DE BUSCA (IGUAL À HOME) ---
+    const searchInput = document.getElementById("search-bar");
+    const resultsBox = document.getElementById("search-results");
 
-    // CARREGAR PERFIL (Read)
-    async function carregarPerfil() {
-        try {
-            const response = await fetch(`${APP_BASE_URL}/usuarios/${userIdToFetch}`);
-            if (!response.ok) throw new Error("Usuário não encontrado");
-
-            const usuario = await response.json();
-
-            displayNome.textContent = `${usuario.nome} ${usuario.sobrenome}`;
-            displayUsername.textContent = `@${usuario.username}`;
-            displayBio.textContent = usuario.bio || "> Olá, mundo! Bem-vindo ao meu perfil.";
-
-            document.querySelector('#edit-nome').value = usuario.nome;
-            document.querySelector('#edit-sobrenome').value = usuario.sobrenome;
-            document.querySelector('#edit-bio').value = usuario.bio || "";
-
-            // Só mostra o botão editar se for o SEU perfil
-            if (userIdToFetch == loggedUserId) {
-                btnEditar.style.display = 'block';
-            } else {
-                btnEditar.style.display = 'none';
-            }
-        } catch (error) {
-            console.error("Erro ao carregar perfil:", error);
-        }
+    if (searchInput) {
+        searchInput.addEventListener("input", async () => {
+            const termo = searchInput.value.trim();
+            if (termo.length < 2) { resultsBox.style.display = "none"; return; }
+            try {
+                const response = await fetch(`${APP_BASE_URL}/usuarios/busca?username=${encodeURIComponent(termo)}`);
+                const usuarios = await response.json();
+                resultsBox.innerHTML = usuarios.map(u => `
+                    <div class="search-item" onclick="window.location.href='perfil.html?id=${u.id}'">
+                        <strong>@${u.username}</strong>
+                        <span>${u.nome} ${u.sobrenome}</span>
+                    </div>
+                `).join("");
+                resultsBox.style.display = "block";
+            } catch (e) { console.error(e); }
+        });
     }
 
-    // ALTERNAR PARA MODO EDIÇÃO
-    btnEditar.addEventListener('click', () => {
-        document.getElementById('view-mode').style.display = 'none';
-        document.getElementById('edit-mode').style.display = 'flex';
-        btnEditar.style.display = 'none';
+    // --- 2. CARREGAR DADOS DO PERFIL ---
+    const carregarPerfil = async () => {
+        try {
+            const response = await fetch(`${APP_BASE_URL}/usuarios/${userIdToFetch}`);
+            if (!response.ok) return;
+            const u = await response.json();
+
+            // Preencher Visualização
+            document.getElementById('display-nome-completo').textContent = `${u.nome} ${u.sobrenome}`;
+            document.getElementById('display-username').textContent = `@${u.username}`;
+            document.getElementById('display-bio').textContent = u.bio || "> Sem biografia.";
+            document.getElementById('display-telefone').textContent = u.telefone ? `📞 ${u.telefone}` : "";
+            document.getElementById('display-dtNasc').textContent = u.dtNasc ? `🎂 ${u.dtNasc}` : "";
+
+            // Lógica da Foto: Banco -> bitPerfil.png
+            const foto = u.foto_url && u.foto_url.length > 10 ? u.foto_url : '../img/bitPerfil.png';
+            document.getElementById('display-avatar').style.backgroundImage = `url('${foto}')`;
+            document.getElementById('header-avatar').style.backgroundImage = `url('${foto}')`;
+
+            // Preencher Edição
+            document.getElementById('edit-nome').value = u.nome;
+            document.getElementById('edit-sobrenome').value = u.sobrenome;
+            document.getElementById('edit-bio').value = u.bio || "";
+            document.getElementById('edit-telefone').value = u.telefone || "";
+            document.getElementById('edit-dtNasc').value = u.dtNasc || "";
+
+            // Mostrar botão de edição apenas se for o dono do perfil
+            if (userIdToFetch == loggedUserId) {
+                document.getElementById('btn-edit-perfil').style.display = 'block';
+                document.getElementById('avatar-overlay').style.display = 'flex';
+            } else {
+                document.getElementById('avatar-overlay').style.display = 'none';
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    // --- 3. LÓGICA DE UPLOAD DE FOTO ---
+    const avatarWrapper = document.querySelector('.avatar-wrapper');
+    const fileInput = document.getElementById('file-input');
+
+    avatarWrapper.addEventListener('click', () => {
+        if (userIdToFetch == loggedUserId) fileInput.click();
     });
 
-    // SALVAR ALTERAÇÕES (Update)
-    btnSalvar.addEventListener('click', async () => {
-        const novosDados = {
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const base64 = event.target.result;
+            // Preview imediato
+            document.getElementById('display-avatar').style.backgroundImage = `url('${base64}')`;
+            document.getElementById('header-avatar').style.backgroundImage = `url('${base64}')`;
+            // Salva no banco (via função de update)
+            await salvarAlteracoes(base64);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // --- 4. SALVAR ALTERAÇÕES ---
+    const salvarAlteracoes = async (novaFoto = null) => {
+        const dados = {
             id: parseInt(loggedUserId),
-            nome: document.querySelector('#edit-nome').value,
-            sobrenome: document.querySelector('#edit-sobrenome').value,
-            bio: document.querySelector('#edit-bio').value
+            nome: document.getElementById('edit-nome').value,
+            sobrenome: document.getElementById('edit-sobrenome').value,
+            bio: document.getElementById('edit-bio').value,
+            telefone: document.getElementById('edit-telefone').value,
+            dtNasc: document.getElementById('edit-dtNasc').value,
+            foto_url: novaFoto || null
         };
 
         try {
-            const response = await fetch(`${APP_BASE_URL}/usuarios/update`, {
+            const res = await fetch(`${APP_BASE_URL}/usuarios/update`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(novosDados)
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(dados)
             });
+            if (res.ok && !novaFoto) window.location.reload();
+        } catch (e) { console.error(e); }
+    };
 
-            if (response.ok) {
-                alert("Perfil atualizado com sucesso!");
-                window.location.reload();
-            } else {
-                alert("Erro ao salvar alterações no servidor.");
-            }
-        } catch (error) {
-            console.error("Erro de conexão:", error);
-            alert("Erro de conexão com o servidor.");
-        }
+    document.getElementById('btn-save-perfil').addEventListener('click', () => salvarAlteracoes());
+    document.getElementById('btn-edit-perfil').addEventListener('click', () => {
+        document.getElementById('view-mode').style.display = 'none';
+        document.getElementById('edit-mode').style.display = 'block';
     });
+    document.getElementById('btn-cancel-edit').addEventListener('click', () => window.location.reload());
 
     carregarPerfil();
 });
