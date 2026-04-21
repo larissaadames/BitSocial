@@ -1,27 +1,80 @@
 const APP_BASE_URL = "http://127.0.0.1:8000";
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. GESTÃO DE CONTEXTO
     const params = new URLSearchParams(window.location.search);
     const targetUserId = params.get('id'); 
     const loggedUserId = localStorage.getItem('userId');
     const userIdToFetch = targetUserId || loggedUserId;
 
-    if (!userIdToFetch || userIdToFetch === "null") {
+    // Redireciona se não houver utilizador logado
+    if (!loggedUserId || loggedUserId === "null") {
         window.location.href = "../Login/login.html";
         return;
     }
 
-    // --- 1. LÓGICA DE BUSCA (IGUAL À HOME) ---
+    // 2. ELEMENTOS DA INTERFACE
+    const notificationContainer = document.getElementById('notification-container');
+    const displayAvatar = document.getElementById('display-avatar');
+    const headerAvatar = document.getElementById('header-avatar');
+    const dropdown = document.getElementById('user-dropdown');
+    const logoutModal = document.getElementById('logout-modal');
+    const inputTelefone = document.getElementById('edit-telefone');
+
+    // 3. SISTEMA DE NOTIFICAÇÕES (TOASTS)
+    const showNotification = (message, type = 'success') => {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        notificationContainer.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    };
+
+    // --- 4. LÓGICA DE LOGOUT (MODAL E DROPDOWN) ---
+    headerAvatar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = dropdown.style.display === 'flex';
+        dropdown.style.display = isVisible ? 'none' : 'flex';
+    });
+
+    document.addEventListener('click', () => { dropdown.style.display = 'none'; });
+
+    document.getElementById('btn-logout-trigger').addEventListener('click', () => {
+        logoutModal.style.display = 'flex';
+    });
+
+    document.getElementById('cancel-logout').addEventListener('click', () => {
+        logoutModal.style.display = 'none';
+    });
+
+    document.getElementById('confirm-logout').addEventListener('click', () => {
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        window.location.href = "../Login/login.html";
+    });
+
+    // 5. MÁSCARA DE TELEFONE
+    inputTelefone.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 11) v = v.substring(0, 11);
+        let r = v.replace(/^(\d{2})(\d)/g, '($1) $2');
+        r = r.replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = r;
+    });
+
+    // 6. LÓGICA DE BUSCA
     const searchInput = document.getElementById("search-bar");
     const resultsBox = document.getElementById("search-results");
-
     if (searchInput) {
         searchInput.addEventListener("input", async () => {
             const termo = searchInput.value.trim();
             if (termo.length < 2) { resultsBox.style.display = "none"; return; }
             try {
-                const response = await fetch(`${APP_BASE_URL}/usuarios/busca?username=${encodeURIComponent(termo)}`);
-                const usuarios = await response.json();
+                const res = await fetch(`${APP_BASE_URL}/usuarios/busca?username=${encodeURIComponent(termo)}`);
+                const usuarios = await res.json();
                 resultsBox.innerHTML = usuarios.map(u => `
                     <div class="search-item" onclick="window.location.href='perfil.html?id=${u.id}'">
                         <strong>@${u.username}</strong>
@@ -33,76 +86,64 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- 2. CARREGAR DADOS DO PERFIL ---
+    // --- 7. CARREGAR HEADER (Sempre o LOGADO) ---
+    const carregarHeader = async () => {
+        try {
+            const res = await fetch(`${APP_BASE_URL}/usuarios/${loggedUserId}`);
+            if (res.ok) {
+                const u = await res.json();
+                const foto = (u.foto_url && u.foto_url.length > 50) ? u.foto_url : '../img/bitPerfil.png';
+                headerAvatar.style.backgroundImage = `url('${foto}')`;
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    // --- 8. CARREGAR PERFIL (Dono ou Visitado) ---
     const carregarPerfil = async () => {
         try {
-            const response = await fetch(`${APP_BASE_URL}/usuarios/${userIdToFetch}`);
-            if (!response.ok) return;
-            const u = await response.json();
+            const res = await fetch(`${APP_BASE_URL}/usuarios/${userIdToFetch}`);
+            if (!res.ok) throw new Error();
+            const u = await res.json();
 
-            // Preencher Visualização
             document.getElementById('display-nome-completo').textContent = `${u.nome} ${u.sobrenome}`;
             document.getElementById('display-username').textContent = `@${u.username}`;
             document.getElementById('display-bio').textContent = u.bio || "> Sem biografia.";
             document.getElementById('display-telefone').textContent = u.telefone ? `📞 ${u.telefone}` : "";
             document.getElementById('display-dtNasc').textContent = u.dtNasc ? `🎂 ${u.dtNasc}` : "";
 
-            // Lógica da Foto: Banco -> bitPerfil.png
-            const foto = u.foto_url && u.foto_url.length > 10 ? u.foto_url : '../img/bitPerfil.png';
-            document.getElementById('display-avatar').style.backgroundImage = `url('${foto}')`;
-            document.getElementById('header-avatar').style.backgroundImage = `url('${foto}')`;
+            const fotoPerfil = (u.foto_url && u.foto_url.length > 50) ? u.foto_url : '../img/bitPerfil.png';
+            displayAvatar.style.backgroundImage = `url('${fotoPerfil}')`;
 
-            // Preencher Edição
-            document.getElementById('edit-nome').value = u.nome;
-            document.getElementById('edit-sobrenome').value = u.sobrenome;
-            document.getElementById('edit-bio').value = u.bio || "";
-            document.getElementById('edit-telefone').value = u.telefone || "";
-            document.getElementById('edit-dtNasc').value = u.dtNasc || "";
-
-            // Mostrar botão de edição apenas se for o dono do perfil
             if (userIdToFetch == loggedUserId) {
                 document.getElementById('btn-edit-perfil').style.display = 'block';
                 document.getElementById('avatar-overlay').style.display = 'flex';
-            } else {
-                document.getElementById('avatar-overlay').style.display = 'none';
+                document.getElementById('edit-nome').value = u.nome;
+                document.getElementById('edit-sobrenome').value = u.sobrenome;
+                document.getElementById('edit-bio').value = u.bio || "";
+                document.getElementById('edit-telefone').value = u.telefone || "";
+                document.getElementById('edit-dtNasc').value = u.dtNasc || "";
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { showNotification("Erro ao carregar dados.", "error"); }
     };
 
-    // --- 3. LÓGICA DE UPLOAD DE FOTO ---
-    const avatarWrapper = document.querySelector('.avatar-wrapper');
-    const fileInput = document.getElementById('file-input');
-
-    avatarWrapper.addEventListener('click', () => {
-        if (userIdToFetch == loggedUserId) fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            const base64 = event.target.result;
-            // Preview imediato
-            document.getElementById('display-avatar').style.backgroundImage = `url('${base64}')`;
-            document.getElementById('header-avatar').style.backgroundImage = `url('${base64}')`;
-            // Salva no banco (via função de update)
-            await salvarAlteracoes(base64);
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // --- 4. SALVAR ALTERAÇÕES ---
+    // 9. SALVAR ALTERAÇÕES
     const salvarAlteracoes = async (novaFoto = null) => {
+        const nome = document.getElementById('edit-nome').value.trim();
+        const telefone = inputTelefone.value.trim();
+        
+        if (nome.length < 2) {
+            showNotification("Nome inválido.", "error");
+            return;
+        }
+
         const dados = {
             id: parseInt(loggedUserId),
-            nome: document.getElementById('edit-nome').value,
+            nome: nome,
             sobrenome: document.getElementById('edit-sobrenome').value,
             bio: document.getElementById('edit-bio').value,
-            telefone: document.getElementById('edit-telefone').value,
+            telefone: telefone,
             dtNasc: document.getElementById('edit-dtNasc').value,
-            foto_url: novaFoto || null
+            foto_url: novaFoto
         };
 
         try {
@@ -111,9 +152,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(dados)
             });
-            if (res.ok && !novaFoto) window.location.reload();
-        } catch (e) { console.error(e); }
+            if (res.ok) {
+                showNotification("Sucesso!");
+                if (!novaFoto) setTimeout(() => window.location.reload(), 1000);
+            }
+        } catch (e) { showNotification("Erro ao salvar.", "error"); }
     };
+
+    // 10. UPLOAD DE FOTO
+    document.getElementById('avatar-wrapper').addEventListener('click', () => {
+        if (userIdToFetch == loggedUserId) document.getElementById('file-input').click();
+    });
+
+    document.getElementById('file-input').addEventListener('change', (e) => {
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+            const base64 = ev.target.result;
+            displayAvatar.style.backgroundImage = `url('${base64}')`;
+            headerAvatar.style.backgroundImage = `url('${base64}')`;
+            await salvarAlteracoes(base64);
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    });
 
     document.getElementById('btn-save-perfil').addEventListener('click', () => salvarAlteracoes());
     document.getElementById('btn-edit-perfil').addEventListener('click', () => {
@@ -122,5 +182,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     document.getElementById('btn-cancel-edit').addEventListener('click', () => window.location.reload());
 
+    carregarHeader();
     carregarPerfil();
 });

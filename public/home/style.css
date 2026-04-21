@@ -1,4 +1,4 @@
-/* 1. Importação e Variáveis (Mantidas) */
+/* 1. Importação e Variáveis */
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
 
 :root {
@@ -11,6 +11,7 @@
   --border-color: #333; 
   --upvote-color: #ff4d4d; 
   --downvote-color: #7b2ff7; 
+  --error-red: #ff4d4d;
 }
 
 /* 2. Configurações Base */
@@ -30,12 +31,12 @@ body.dark-theme {
     overflow: hidden;
 }
 
-/* --- CABEÇALHO (Largura 1400px | Altura 75px) --- */
+/* --- CABEÇALHO (Layout de 3 Colunas para Centralização) --- */
 .app-header {
     background-color: #121212;
     border-bottom: 1px solid var(--border-color);
     padding: 0 30px;
-    height: 75px; /* Maior presença */
+    height: 75px;
     display: flex;
     align-items: center;
     flex-shrink: 0;
@@ -44,45 +45,59 @@ body.dark-theme {
 
 .header-container {
     width: 100%;
-    max-width: 1400px; /* Expandido */
+    max-width: 1400px;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between;
     align-items: center;
 }
 
-.logo-section { display: flex; align-items: center; gap: 10px; text-decoration: none; flex: 1; }
+/* Coluna 1: Logo (Esquerda) */
+.logo-section { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    text-decoration: none; 
+    flex: 1; 
+}
 .logo-text { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: -1px; }
 .logo-icon-img { height: 44px; width: auto; filter: drop-shadow(0 0 5px rgba(123, 47, 247, 0.5)); }
 
-/* BUSCA REDIMENSIONADA */
+/* Coluna 2: Busca (Centro Matemático) */
 .search-section {
     position: relative;
-    width: 450px; /* Mais larga */
     flex: 2;
     display: flex;
     justify-content: center;
+    margin: 0 auto;
 }
 
 .search-bar {
     background-color: var(--input-bg);
-    border: 1px solid transparent;
+    border: 1px solid #333; /* Borda levemente visível */
     border-radius: 10px;
     padding: 12px 20px;
     color: #fff;
     width: 100%;
+    max-width: 450px; /* Largura fixa da barra */
     outline: none;
     font-size: 16px;
     transition: 0.3s;
 }
 
-.search-bar:focus { border-color: var(--accent-purple); box-shadow: 0 0 10px rgba(123, 47, 247, 0.2); }
+.search-bar:focus { 
+    border-color: var(--accent-purple); 
+    box-shadow: 0 0 10px rgba(123, 47, 247, 0.2); 
+    background-color: #2a2a2a;
+}
 
+/* Caixa de Resultados (Sempre embaixo da barra) */
 .search-results-box {
     position: absolute;
     top: 110%;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
+    max-width: 450px;
     background-color: #181818;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -93,16 +108,31 @@ body.dark-theme {
     box-shadow: 0 10px 25px rgba(0,0,0,0.6);
 }
 
-.search-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; }
+.search-item { 
+    padding: 15px 20px; 
+    border-bottom: 1px solid #222; 
+    cursor: pointer; 
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 .search-item:hover { background-color: #252525; }
-.search-item strong { display: block; color: var(--accent-purple); font-size: 15px; }
+.search-item strong { display: block; color: var(--accent-purple); font-size: 15px; font-weight: 700; }
+.search-item span { font-size: 13px; color: var(--text-label); }
 
-/* AVATAR DO HEADER */
-.user-section { flex: 1; display: flex; justify-content: flex-end; }
+/* Coluna 3: Avatar (Direita) */
+.user-menu-wrapper { 
+    flex: 1; 
+    display: flex; 
+    justify-content: flex-end; 
+    position: relative;
+    cursor: pointer;
+}
+
 .header-user-avatar { 
-    width: 46px; /* Maior */
+    width: 46px; 
     height: 46px; 
-    background-color: #D9D9D9; 
+    background-color: #333; 
     border-radius: 50%; 
     background-size: cover; 
     background-position: center;
@@ -110,18 +140,18 @@ body.dark-theme {
     flex-shrink: 0;
 }
 
-/* --- GRID PRINCIPAL (Recalibrado) --- */
+/* --- GRID PRINCIPAL --- */
 .main-content { 
     flex-grow: 1; 
     width: 100%; 
-    max-width: 1400px; /* Expandido */
+    max-width: 1400px; 
     margin: 0 auto; 
     height: 100%; 
 }
 
 .home-grid { 
     display: grid; 
-    grid-template-columns: 280px 1fr; /* Sidebar mais imponente */
+    grid-template-columns: 280px 1fr; 
     gap: 30px; 
     height: 100%; 
 }
@@ -144,7 +174,7 @@ body.dark-theme {
     align-items: center; 
     gap: 12px; 
     font-weight: 600; 
-    font-size: 16px; /* Texto maior */
+    font-size: 16px; 
     color: #aaa; 
     transition: 0.2s; 
 }
@@ -156,7 +186,7 @@ body.dark-theme {
 .feed-scroll { display: flex; flex-direction: column; gap: 30px; overflow-y: auto; scrollbar-width: none; }
 .feed-scroll::-webkit-scrollbar { display: none; }
 
-/* CARDS DE POST (Mantendo TODA a sua lógica estética) */
+/* CARDS */
 .create-post-card { 
     background-color: var(--card-bg); 
     border-radius: 12px; 
@@ -180,13 +210,13 @@ body.dark-theme {
 }
 
 .post-header { display: flex; align-items: center; gap: 15px; }
-.post-user-avatar { width: 55px; height: 55px; background-color: #D9D9D9; border-radius: 50%; border: 2px solid var(--border-color); }
+.post-user-avatar { width: 55px; height: 55px; background-color: #333; border-radius: 50%; border: 2px solid var(--border-color); }
 .post-user-name { font-weight: 700; font-size: 20px; color: #fff; }
 
 .post-content-box { background-color: #1a1a1a; border-radius: 12px; padding: 25px; }
 .post-text { font-size: 16px; color: #ccc; line-height: 1.6; font-family: sans-serif; }
 
-/* RODAPÉ E VOTOS (Animações Restauradas) */
+/* VOTOS */
 .post-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid var(--border-color); }
 .post-votes { background-color: #1e1e1e; padding: 8px 18px; border-radius: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); }
 
@@ -206,7 +236,73 @@ body.dark-theme {
     50% { transform: rotate(var(--rot)) scale(1.4); }
     100% { transform: rotate(var(--rot)) scale(1); }
 }
-
 .animating { animation: vote-pop 0.3s ease-out; }
 
 .vote-count { font-size: 16px; font-weight: 700; color: #fff; min-width: 25px; text-align: center; }
+
+/* --- DROPDOWN DO USUÁRIO --- */
+.dropdown-menu {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background-color: #181818;
+    border: 2px solid var(--accent-purple);
+    border-radius: 10px;
+    width: 200px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    z-index: 2000;
+}
+
+.dropdown-item {
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.dropdown-item:hover { background-color: var(--accent-purple); }
+.dropdown-item.logout-style { border-top: 1px solid #333; color: var(--error-red); }
+.dropdown-item.logout-style:hover { background-color: var(--error-red); color: white; }
+
+/* --- MODAL DE CONFIRMAÇÃO --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #1e1e1e;
+    border: 2px solid var(--accent-purple);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h3 { font-size: 24px; margin-bottom: 15px; color: var(--accent-purple); }
+.modal-content p { color: #aaa; margin-bottom: 30px; font-size: 14px; }
+.modal-actions { display: flex; gap: 15px; justify-content: center; }
+.btn-confirm { background-color: var(--error-red); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.btn-cancel { background-color: #444; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }

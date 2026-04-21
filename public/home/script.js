@@ -11,25 +11,80 @@ const APP_BASE_URL = (() => {
 
 document.addEventListener('DOMContentLoaded', () => {
     
+    const loggedUserId = localStorage.getItem('userId');
+    const avatarElement = document.getElementById('header-avatar');
+    const dropdown = document.getElementById('user-dropdown');
+    const logoutTrigger = document.getElementById('btn-logout-trigger');
+    const logoutModal = document.getElementById('logout-modal');
+    const confirmLogoutBtn = document.getElementById('confirm-logout');
+    const cancelLogoutBtn = document.getElementById('cancel-logout');
+
+    // Redireciona se não houver usuário logado
+    if (!loggedUserId) {
+        window.location.href = "../Login/login.html";
+        return;
+    }
+
     // --- 1. CARREGAR AVATAR NO HEADER ---
     const carregarUsuarioNoHeader = async () => {
-        const userId = localStorage.getItem('userId');
-        const avatarElement = document.getElementById('header-avatar');
-        if (!userId || !avatarElement) return;
+        if (!avatarElement) return;
 
         try {
-            const response = await fetch(`${APP_BASE_URL}/usuarios/${userId}`);
+            const response = await fetch(`${APP_BASE_URL}/usuarios/${loggedUserId}`);
             if (response.ok) {
-                // Forçando a imagem padrão bitPerfil.png
-                avatarElement.style.backgroundImage = "url('../img/bitPerfil.png')";
+                const u = await response.json();
+                
+                // Verifica se existe foto no banco, senão usa o placeholder
+                const fotoFinal = (u.foto_url && u.foto_url.length > 50) ? u.foto_url : '../img/bitPerfil.png';
+                
+                avatarElement.style.backgroundImage = `url('${fotoFinal}')`;
                 avatarElement.style.backgroundSize = "cover";
                 avatarElement.style.backgroundPosition = "center";
             }
-        } catch (error) { console.error("Erro no avatar:", error); }
+        } catch (error) { 
+            console.error("Erro ao carregar avatar do cabeçalho:", error); 
+        }
     };
     carregarUsuarioNoHeader();
 
-    // --- 2. LÓGICA DE BUSCA ---
+    // --- 2. LÓGICA DO MENU DROPDOWN (LOGOUT) ---
+    
+    // Abrir/Fechar dropdown ao clicar no avatar
+    avatarElement.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique feche o menu imediatamente
+        const isVisible = dropdown.style.display === 'flex';
+        dropdown.style.display = isVisible ? 'none' : 'flex';
+    });
+
+    // Fechar dropdown ao clicar em qualquer outro lugar da tela
+    document.addEventListener('click', () => {
+        if (dropdown) dropdown.style.display = 'none';
+    });
+
+    // Abrir Modal de Confirmação ao clicar em "Sair" no menu
+    if (logoutTrigger) {
+        logoutTrigger.addEventListener('click', () => {
+            logoutModal.style.display = 'flex';
+        });
+    }
+
+    // Botão "Cancelar" do Modal
+    if (cancelLogoutBtn) {
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+    }
+
+    // Botão "Confirmar" do Modal (Limpa dados e sai)
+    if (confirmLogoutBtn) {
+        confirmLogoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+            window.location.href = "../Login/login.html";
+        });
+    }
+
+    // --- 3. LÓGICA DE BUSCA ---
     const searchInput = document.getElementById("search-bar");
     const resultsBox = document.getElementById("search-results");
 
@@ -50,11 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `).join("");
                 resultsBox.style.display = "block";
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Erro na busca:", e); }
         });
     }
 
-    // --- 3. LÓGICA DE VOTOS (RESTAURADA COM ANIMAÇÕES) ---
+    // --- 4. LÓGICA DE VOTOS ---
     const postCards = document.querySelectorAll('.post-card');
 
     postCards.forEach(post => {
@@ -72,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const activeClass = isUp ? 'upvoted' : 'downvoted';
             const otherClass = isUp ? 'downvoted' : 'upvoted';
 
-            // Lógica de toggle
             if (userVote === (isUp ? 1 : -1)) {
                 userVote = 0;
                 btn.classList.remove(activeClass);
@@ -81,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.add(activeClass);
                 otherBtn.classList.remove(otherClass);
                 
-                // Dispara a animação de "pop" do seu CSS
                 btn.classList.add('animating');
                 setTimeout(() => btn.classList.remove('animating'), 300);
             }

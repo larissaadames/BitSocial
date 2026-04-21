@@ -8,9 +8,11 @@
 </head>
 <body class="dark-theme">
 
+    <div id="notification-container"></div>
+
     <header class="app-header">
         <div class="header-container">
-            <a href="../home/index.html" class="logo-section">
+            <a href="../home/index.html" class="logo-section logo-link">
                 <span class="logo-text">Social</span>
                 <img src="../img/bitLampada.png" alt="Logo SocialBit" class="logo-icon-img">
             </a>
@@ -20,18 +22,22 @@
                 <div id="search-results" class="search-results-box"></div>
             </div>
 
-            <a href="perfil.html" class="user-section">
+            <div class="user-menu-wrapper">
                 <div class="header-user-avatar" id="header-avatar"></div>
-            </a>
+                
+                <div id="user-dropdown" class="dropdown-menu">
+                    <a href="perfil.html" class="dropdown-item">Acessar Perfil</a>
+                    <button id="btn-logout-trigger" class="dropdown-item logout-style">Sair</button>
+                </div>
+            </div>
         </div>
     </header>
 
     <main class="main-content">
         <div class="profile-container">
-            
             <section class="profile-card">
                 <div class="profile-main-info">
-                    <div class="avatar-wrapper">
+                    <div class="avatar-wrapper" id="avatar-wrapper">
                         <div class="profile-avatar-large" id="display-avatar"></div>
                         <div class="avatar-overlay" id="avatar-overlay">Trocar Foto</div>
                     </div>
@@ -39,34 +45,42 @@
                     <div id="view-mode" class="info-text-section">
                         <h1 id="display-nome-completo">Carregando...</h1>
                         <p id="display-username">@usuario</p>
-                        
                         <div class="bio-box">
                             <p id="display-bio">> Olá! Bem-vindo ao meu SocialBit.</p>
                         </div>
-
                         <div class="extra-info">
-                            <span id="display-telefone"></span>
-                            <span id="display-dtNasc"></span>
+                            <span id="display-telefone" class="info-item"></span>
+                            <span id="display-dtNasc" class="info-item"></span>
                         </div>
-
                         <button id="btn-edit-perfil" class="btn-primary" style="display: none;">Editar Perfil</button>
                     </div>
 
                     <div id="edit-mode" class="info-edit-section" style="display: none;">
                         <h2 class="edit-title">Atualizar Perfil</h2>
-                        
                         <div class="input-group">
-                            <input type="text" id="edit-nome" placeholder="Nome">
-                            <input type="text" id="edit-sobrenome" placeholder="Sobrenome">
+                            <div class="input-wrapper">
+                                <label>Nome</label>
+                                <input type="text" id="edit-nome" maxlength="50">
+                            </div>
+                            <div class="input-wrapper">
+                                <label>Sobrenome</label>
+                                <input type="text" id="edit-sobrenome" maxlength="50">
+                            </div>
                         </div>
-
                         <div class="input-group">
-                            <input type="text" id="edit-telefone" placeholder="Telefone">
-                            <input type="date" id="edit-dtNasc">
+                            <div class="input-wrapper">
+                                <label>Telefone</label>
+                                <input type="text" id="edit-telefone" placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="input-wrapper">
+                                <label>Data de Nascimento</label>
+                                <input type="date" id="edit-dtNasc">
+                            </div>
                         </div>
-
-                        <textarea id="edit-bio" placeholder="Sua biografia..."></textarea>
-
+                        <div class="input-wrapper">
+                            <label>Biografia (Máx. 255 caracteres)</label>
+                            <textarea id="edit-bio" maxlength="255"></textarea>
+                        </div>
                         <div class="edit-actions">
                             <button id="btn-save-perfil" class="btn-save">Salvar Alterações</button>
                             <button id="btn-cancel-edit" class="btn-cancel">Cancelar</button>
@@ -74,12 +88,21 @@
                     </div>
                 </div>
             </section>
-
         </div>
     </main>
 
-    <input type="file" id="file-input" accept="image/*" style="display: none;">
+    <div id="logout-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Deseja mesmo sair?</h3>
+            <p>Você precisará fazer login novamente para postar e votar.</p>
+            <div class="modal-actions">
+                <button id="confirm-logout" class="btn-confirm">Sim, Sair</button>
+                <button id="cancel-logout" class="btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
+    <input type="file" id="file-input" accept="image/*" style="display: none;">
     <script src="script.js"></script>
 </body>
 </html>

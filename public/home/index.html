@@ -14,13 +14,20 @@
                 <span class="logo-text">Social</span>
                 <img src="../img/bitLampada.png" alt="Bug BitSocial" class="logo-icon-img">
             </a>
+            
             <div class="search-section">
                 <input type="text" placeholder="Pesquisar usuários..." class="search-bar" id="search-bar">
                 <div id="search-results" class="search-results-box"></div> 
             </div>
-            <a href="../perfil/perfil.html" class="user-section user-link">
+
+            <div class="user-menu-wrapper">
                 <div class="header-user-avatar" id="header-avatar"></div>
-            </a>
+                
+                <div id="user-dropdown" class="dropdown-menu">
+                    <a href="../perfil/perfil.html" class="dropdown-item">Acessar Perfil</a>
+                    <button id="btn-logout-trigger" class="dropdown-item logout-style">Sair</button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -68,13 +75,23 @@
                                 <span class="reaction-count">4</span>
                                 <span class="reaction-icon">💡</span>
                             </div>
-
                         </footer>
                     </article>
                 </div>
             </section>
         </div>
     </main>
+
+    <div id="logout-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Deseja mesmo sair?</h3>
+            <p>Você precisará fazer login novamente para postar e votar.</p>
+            <div class="modal-actions">
+                <button id="confirm-logout" class="btn-confirm">Sim, Sair</button>
+                <button id="cancel-logout" class="btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
