@@ -306,3 +306,80 @@ body.dark-theme {
 .modal-actions { display: flex; gap: 15px; justify-content: center; }
 .btn-confirm { background-color: var(--error-red); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 .btn-cancel { background-color: #444; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+/* --- RESPONSIVIDADE HOME --- */
+
+/* Tablets e Telas Médias */
+@media (max-width: 1024px) {
+    .home-grid {
+        grid-template-columns: 80px 1fr; /* Sidebar vira apenas ícones */
+        gap: 15px;
+    }
+
+    .nav-item {
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .nav-item span:not(.nav-icon) {
+        display: none; /* Esconde o texto, deixa só o emoji/ícone */
+    }
+
+    .search-section {
+        width: 300px;
+    }
+}
+
+/* Celulares (Mobile) */
+@media (max-width: 768px) {
+    .app-header {
+        padding: 0 15px;
+    }
+
+    .logo-text {
+        display: none; /* Esconde "Social" para dar espaço à busca */
+    }
+
+    .home-grid {
+        grid-template-columns: 1fr; /* Remove a sidebar da lateral */
+    }
+
+    .nav-sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 0;
+        background-color: #121212;
+        border-right: none;
+        border-top: 1px solid var(--border-color);
+        z-index: 1000;
+    }
+
+    .nav-item {
+        flex: 1;
+        border-radius: 0;
+    }
+
+    .feed-section {
+        padding: 20px 10px;
+        margin-bottom: 70px; /* Espaço para a barra inferior */
+    }
+
+    .create-post-card {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .btn-postar {
+        width: 100%;
+    }
+
+    .post-user-name {
+        font-size: 16px;
+    }
+}
