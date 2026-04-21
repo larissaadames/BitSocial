@@ -1,4 +1,5 @@
-
+CREATE DATABASE socialbit;
+USE socialbit;
 
 /* Lógico_1: */
 
@@ -83,8 +84,8 @@ ALTER TABLE PostSalvo ADD CONSTRAINT FK_PostSalvo_2
     
 
 INSERT INTO Usuario (ID, email, senha, username, nome) 
-VALUES (1, 'teste@gmail.com', '123456cuCU@!', 'testador', 'Larissa');
+VALUES (1, 'teste@gmail.com', '123456testeTESTE@!', 'testador', 'Teste');
 
 
-USE socialbit;
+ALTER TABLE Usuario ADD COLUMN bio TEXT;
 SELECT * FROM Usuario;
