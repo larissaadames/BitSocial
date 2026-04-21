@@ -10,7 +10,7 @@ from jose import jwt, JWTError
 import hashlib
 
 # 1. Configuração do Banco de Dados
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:root@localhost/socialbit"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:1234@localhost/socialbit"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
