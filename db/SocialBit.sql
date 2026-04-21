@@ -1,4 +1,5 @@
-
+CREATE DATABASE socialbit;
+USE socialbit;
 
 /* Lógico_1: */
 
@@ -6,7 +7,7 @@ CREATE TABLE Usuario (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     username varchar(25),
     dtNasc date,
-    senha varchar(25),
+    senha varchar(100),
     email varchar(100),
     nome varchar(25),
     sobrenome varchar(50),
@@ -30,6 +31,12 @@ CREATE TABLE Tipo (
 CREATE TABLE Post_Ususario (
     fk_Usuario_ID INT,
     fk_Post_ID INT
+);
+
+CREATE TABLE PostSalvo (
+    fk_Usuario_ID INT,
+    fk_Post_ID INT,
+    PRIMARY KEY (fk_Usuario_ID, fk_Post_ID)
 );
 
 CREATE TABLE Votacao (
@@ -64,11 +71,21 @@ ALTER TABLE Votacao ADD CONSTRAINT FK_Votacao_3
     FOREIGN KEY (fk_Usuario_ID)
     REFERENCES Usuario (ID)
     ON DELETE SET NULL;
+
+ALTER TABLE PostSalvo ADD CONSTRAINT FK_PostSalvo_1
+    FOREIGN KEY (fk_Usuario_ID)
+    REFERENCES Usuario (ID)
+    ON DELETE CASCADE;
+
+ALTER TABLE PostSalvo ADD CONSTRAINT FK_PostSalvo_2
+    FOREIGN KEY (fk_Post_ID)
+    REFERENCES Post (ID)
+    ON DELETE CASCADE;
     
 
 INSERT INTO Usuario (ID, email, senha, username, nome) 
-VALUES (1, 'teste@gmail.com', '123456cuCU@!', 'testador', 'Larissa');
+VALUES (1, 'teste@gmail.com', '123456testeTESTE@!', 'testador', 'Teste');
 
 
-USE socialbit;
+ALTER TABLE Usuario ADD COLUMN bio TEXT;
 SELECT * FROM Usuario;
