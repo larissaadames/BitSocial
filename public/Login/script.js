@@ -45,7 +45,7 @@ function togglePassword() {
 
   if (input.type === "password") {
     input.type = "text";
-    eyeBtn.textContent = "🔒";
+    eyeBtn.textContent = "👁";
   } else {
     input.type = "password";
     eyeBtn.textContent = "👁";
