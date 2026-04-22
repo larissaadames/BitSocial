@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (userIdToFetch == loggedUserId) {
                 document.getElementById('btn-edit-perfil').style.display = 'block';
-                document.getElementById('avatar-overlay').style.display = 'flex';
+                // document.getElementById('avatar-overlay').style.display = 'flex';
                 document.getElementById('edit-nome').value = u.nome;
                 document.getElementById('edit-sobrenome').value = u.sobrenome;
                 document.getElementById('edit-bio').value = u.bio || "";
@@ -132,60 +132,96 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // 9. SALVAR ALTERAÇÕES
-    const salvarAlteracoes = async (novaFoto = null) => {
-        const nome = document.getElementById('edit-nome').value.trim();
-        const telefone = inputTelefone.value.trim();
+const avatarOverlay = document.getElementById('avatar-overlay');
+    const avatarWrapper = document.getElementById('avatar-wrapper');
+
+   // Função para alternar entre ver e editar
+    const alternarModoEdicao = (editando) => {
+        document.getElementById('view-mode').style.display = editando ? 'none' : 'block';
+        document.getElementById('edit-mode').style.display = editando ? 'block' : 'none';
         
-        if (nome.length < 2) {
-            showNotification("Nome inválido.", "error");
+        const wrapper = document.getElementById('avatar-wrapper');
+        if (editando) {
+            // Adiciona a classe que libera o hover no CSS
+            wrapper.classList.add('modo-edicao');
+        } else {
+            // Remove a classe para travar o hover
+            wrapper.classList.remove('modo-edicao');
+        }
+    };
+
+    document.getElementById('btn-edit-perfil').addEventListener('click', () => alternarModoEdicao(true));
+    document.getElementById('btn-cancel-edit').addEventListener('click', () => window.location.reload());
+
+    // Clique na foto (Só funciona se estiver editando)
+    avatarWrapper.addEventListener('click', () => {
+        const estaEditando = document.getElementById('edit-mode').style.display === 'block';
+        if (estaEditando) {
+            document.getElementById('file-input').click();
+        }
+    });
+
+    // Quando escolher o arquivo
+    document.getElementById('file-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const base64 = ev.target.result;
+                // Atualiza a imagem na tela na hora
+                document.getElementById('display-avatar').style.backgroundImage = `url('${base64}')`;
+                document.getElementById('header-avatar').style.backgroundImage = `url('${base64}')`;
+                
+                // Salva a foto imediatamente chamando a função de salvar
+                salvarDadosPerfil(base64);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Função central para salvar tudo
+    const salvarDadosPerfil = async (fotoParaSalvar = null) => {
+        const nome = document.getElementById('edit-nome').value.trim();
+        
+        // Se o campo nome estiver vazio e não estivermos apenas trocando a foto, avisar
+        if (!nome && !fotoParaSalvar) {
+            showNotification("O nome é obrigatório", "error");
             return;
         }
 
-        const dados = {
+        const payload = {
             id: parseInt(loggedUserId),
-            nome: nome,
-            sobrenome: document.getElementById('edit-sobrenome').value,
+            nome: nome || document.getElementById('display-nome-completo').textContent.split(' ')[0],
+            sobrenome: document.getElementById('edit-sobrenome').value.trim(),
             bio: document.getElementById('edit-bio').value,
-            telefone: telefone,
+            telefone: inputTelefone.value.trim(),
             dtNasc: document.getElementById('edit-dtNasc').value,
-            foto_url: novaFoto
+            foto_url: fotoParaSalvar // Se for null, o backend mantém a foto atual
         };
 
         try {
             const res = await fetch(`${APP_BASE_URL}/usuarios/update`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(dados)
+                body: JSON.stringify(payload)
             });
+
             if (res.ok) {
-                showNotification("Sucesso!");
-                if (!novaFoto) setTimeout(() => window.location.reload(), 1000);
+                showNotification("Perfil atualizado!", "success");
+                // Se NÃO for apenas troca de foto, recarrega a página
+                if (!fotoParaSalvar) {
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            } else {
+                showNotification("Erro ao salvar no servidor", "error");
             }
-        } catch (e) { showNotification("Erro ao salvar.", "error"); }
+        } catch (error) {
+            showNotification("Erro de conexão", "error");
+        }
     };
 
-    // 10. UPLOAD DE FOTO
-    document.getElementById('avatar-wrapper').addEventListener('click', () => {
-        if (userIdToFetch == loggedUserId) document.getElementById('file-input').click();
-    });
-
-    document.getElementById('file-input').addEventListener('change', (e) => {
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
-            const base64 = ev.target.result;
-            displayAvatar.style.backgroundImage = `url('${base64}')`;
-            headerAvatar.style.backgroundImage = `url('${base64}')`;
-            await salvarAlteracoes(base64);
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    });
-
-    document.getElementById('btn-save-perfil').addEventListener('click', () => salvarAlteracoes());
-    document.getElementById('btn-edit-perfil').addEventListener('click', () => {
-        document.getElementById('view-mode').style.display = 'none';
-        document.getElementById('edit-mode').style.display = 'block';
-    });
-    document.getElementById('btn-cancel-edit').addEventListener('click', () => window.location.reload());
+    // Botão Salvar Geral
+    document.getElementById('btn-save-perfil').addEventListener('click', () => salvarDadosPerfil());
 
     carregarHeader();
     carregarPerfil();
