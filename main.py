@@ -11,16 +11,18 @@ from jose import jwt, JWTError
 from urllib.parse import quote_plus
 import hashlib
 import re
-import requests
 
 # Configuracao fixa (sem variaveis de ambiente)
 DB_USER = "root"
-DB_PASSWORD = "root"
+DB_PASSWORD = "PUC%401234"
 DB_NAME = "socialbit"
 DB_HOST = "localhost"
-SQLALCHEMY_DATABASE_URL = (
-    f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}/{DB_NAME}"
-)
+
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:PUC%401234@localhost/socialbit"
+
+# SQLALCHEMY_DATABASE_URL = (
+#     f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}/{DB_NAME}"
+# )
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
