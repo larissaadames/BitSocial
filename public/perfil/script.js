@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = "../Login/login.html";
     });
 
-    // 5. MÁSCARA TELEFONE
+    // 5. MÁSCARA TELEFONE E REGEXES
     inputTelefone.addEventListener('input', (e) => {
         let v = e.target.value.replace(/\D/g, '');
         if (v.length > 11) v = v.substring(0, 11);
@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         r = r.replace(/(\d{5})(\d)/, '$1-$2');
         e.target.value = r;
     });
+    
 
     // 6. LÓGICA DE BUSCA
     const searchInput = document.getElementById("search-bar");
@@ -147,11 +148,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const salvarAlteracoes = async () => {
         const nome = document.getElementById('edit-nome').value.trim();
         const sobrenome = document.getElementById('edit-sobrenome').value.trim();
+        const regexNome = /^[A-Za-zÀ-ÿ\s]{2,25}$/;
+        const regexSobrenome = /^[A-Za-zÀ-ÿ\s]{2,50}$/;
         const telefoneVal = inputTelefone.value.trim();
         const dtNascVal = inputDataNasc.value;
         
-        if (nome.length < 2 || sobrenome.length < 2) {
-            showNotification("Nome e sobrenome muito curtos.", "error");
+        
+        if (!regexNome.test(nome)) {
+        showNotification("O nome deve ter entre 2 e 25 letras (sem números ou símbolos).", "error");
+        return;
+        }
+
+        if (!regexSobrenome.test(sobrenome)) {
+            showNotification("O sobrenome deve ter entre 2 e 50 letras (sem números ou símbolos).", "error");
             return;
         }
 
@@ -242,6 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-edit-perfil').addEventListener('click', () => {
         document.getElementById('view-mode').style.display = 'none';
         document.getElementById('edit-mode').style.display = 'block';
+        document.getElementById('avatar-wrapper').classList.add('modo-edicao');
     });
 
     btnCancelar.addEventListener('click', () => window.location.reload());

@@ -1,6 +1,5 @@
 import pymysql
 
-# Configuração do banco de dados (Mantive seus dados originais)
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
