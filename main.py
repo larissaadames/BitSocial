@@ -1,15 +1,28 @@
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey, text, func, and_
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session, relationship
+from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import datetime, timedelta
+from jose import jwt, JWTError
+from urllib.parse import quote_plus
+import hashlib
+import os
+import re
 
 # --- 1. CONFIGURAÇÃO DO BANCO DE DADOS ---
-# Utilizando suas credenciais padrão
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:1234@localhost/socialbit"
+# Variaveis de ambiente permitem ajustar acesso sem editar o codigo.
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "root")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_NAME = os.getenv("DB_NAME", "socialbit")
+
+SQLALCHEMY_DATABASE_URL = (
+    f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}/{DB_NAME}"
+)
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -28,19 +41,26 @@ class Usuario(Base):
     telefone = Column(String(20))
     bio = Column(Text, nullable=True)
     foto_url = Column(Text, nullable=True) # Para salvar Base64
-    
-    # Relacionamento: Um usuário tem muitos posts
-    posts = relationship("Post", back_populates="autor")
 
 class Post(Base):
     __tablename__ = "Post"
     ID = Column(Integer, primary_key=True, index=True)
-    conteudo = Column(Text)
-    votos = Column(Integer, default=0)
-    usuario_id = Column(Integer, ForeignKey("Usuario.ID"))
-    
-    # Relacionamento: Cada post pertence a um usuário
-    autor = relationship("Usuario", back_populates="posts")
+    # Schema legado usa coluna texto para conteudo do post.
+    conteudo = Column("texto", Text)
+    # Schema legado usa coluna voto (singular).
+    votos = Column("voto", Integer, default=0)
+
+
+class PostUsuario(Base):
+    __tablename__ = "Post_Ususario"
+    usuario_id = Column("fk_Usuario_ID", Integer, ForeignKey("Usuario.ID"), primary_key=True)
+    post_id = Column("fk_Post_ID", Integer, ForeignKey("Post.ID"), primary_key=True)
+
+
+class PostSalvo(Base):
+    __tablename__ = "PostSalvo"
+    usuario_id = Column("fk_Usuario_ID", Integer, ForeignKey("Usuario.ID"), primary_key=True)
+    post_id = Column("fk_Post_ID", Integer, ForeignKey("Post.ID"), primary_key=True)
 
 # Garante que todas as tabelas e colunas novas existam
 Base.metadata.create_all(bind=engine)
@@ -75,6 +95,10 @@ class PostCreate(BaseModel):
     usuario_id: int
     conteudo: str
 
+
+class PostCreateAuth(BaseModel):
+    conteudo: str
+
 # --- 4. INICIALIZAÇÃO E MIDDLEWARES ---
 
 app = FastAPI()
@@ -90,17 +114,64 @@ app.add_middleware(
 # Montagem da pasta de arquivos estáticos
 app.mount("/public", StaticFiles(directory="public"), name="public")
 
-# Cria apenas a tabela de salvos quando ainda não existir.
-PostSalvo.__table__.create(bind=engine, checkfirst=True)
-
 
 def ensure_schema_compatibility():
+    def column_exists(conn, table_name: str, column_name: str) -> bool:
+        row = conn.execute(
+            text(
+                """
+                SELECT 1
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = :table_name
+                  AND COLUMN_NAME = :column_name
+                LIMIT 1
+                """
+            ),
+            {"table_name": table_name, "column_name": column_name},
+        ).first()
+        return row is not None
+
     try:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE Usuario MODIFY COLUMN senha VARCHAR(100)"))
+
+            required_usuario_columns = {
+                "bio": "ALTER TABLE Usuario ADD COLUMN bio TEXT NULL",
+                "foto_url": "ALTER TABLE Usuario ADD COLUMN foto_url TEXT NULL",
+            }
+
+            for column_name, ddl in required_usuario_columns.items():
+                exists = conn.execute(
+                    text(
+                        """
+                        SELECT 1
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                        WHERE TABLE_SCHEMA = DATABASE()
+                          AND TABLE_NAME = 'Usuario'
+                          AND COLUMN_NAME = :column_name
+                        LIMIT 1
+                        """
+                    ),
+                    {"column_name": column_name},
+                ).first()
+
+                if not exists:
+                    conn.execute(text(ddl))
+
+            # Compatibilidade com schema de Post legado (texto/voto)
+            if not column_exists(conn, "Post", "texto"):
+                conn.execute(text("ALTER TABLE Post ADD COLUMN texto VARCHAR(500) NULL"))
+                if column_exists(conn, "Post", "conteudo"):
+                    conn.execute(text("UPDATE Post SET texto = conteudo WHERE texto IS NULL"))
+
+            if not column_exists(conn, "Post", "voto"):
+                conn.execute(text("ALTER TABLE Post ADD COLUMN voto INT NULL DEFAULT 0"))
+                if column_exists(conn, "Post", "votos"):
+                    conn.execute(text("UPDATE Post SET voto = votos WHERE voto IS NULL"))
     except Exception as error:
         # Se a tabela/coluna ainda nao existir em algum setup, mantemos o app de pe.
-        print(f"Aviso: nao foi possivel ajustar schema de senha: {error}")
+        print(f"Aviso: nao foi possivel ajustar schema do banco: {error}")
 
 
 ensure_schema_compatibility()
@@ -119,6 +190,7 @@ def get_db():
 SECRET_KEY = "troque-esta-chave"
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MINUTES = 60 * 24
+PHONE_REGEX = re.compile(r"^\(\d{2}\)\s\d{4,5}-\d{4}$")
 
 
 def create_access_token(user_id: int) -> str:
@@ -143,6 +215,14 @@ def verify_password(plain_password: str, stored_password: str) -> bool:
     if is_probably_hash(stored_password):
         return get_password_hash(plain_password) == stored_password
     return plain_password == stored_password
+
+
+def validate_phone_or_raise(phone: str):
+    if phone and not PHONE_REGEX.fullmatch(phone.strip()):
+        raise HTTPException(
+            status_code=400,
+            detail="Telefone inválido. Use o formato (00) 00000-0000",
+        )
 
 
 def get_current_user_id(authorization: str = Header(default=None)) -> int:
@@ -180,19 +260,46 @@ async def login(dados: LoginRequest, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.email == dados.email).first()
     if not usuario or not verify_password(dados.senha, usuario.senha):
         raise HTTPException(status_code=401, detail="E-mail ou senha incorretos")
-    return {"message": "Sucesso", "id": usuario.ID, "username": usuario.username}
+
+    # Migra silenciosamente usuarios legados que ainda estao com senha em texto puro.
+    if not is_probably_hash(usuario.senha):
+        usuario.senha = get_password_hash(dados.senha)
+        db.commit()
+
+    token = create_access_token(usuario.ID)
+    return {
+        "message": "Sucesso",
+        "id": usuario.ID,
+        "username": usuario.username,
+        "access_token": token,
+        "token_type": "bearer",
+    }
 
 
 @app.post("/usuarios")
 async def cadastrar_usuario(usuario: CadastroUsuario, db: Session = Depends(get_db)):
+    username_limpo = usuario.username.strip()
+    if not username_limpo:
+        raise HTTPException(status_code=400, detail="Username inválido")
+
     db_user = db.query(Usuario).filter(Usuario.email == usuario.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email já cadastrado")
 
+    db_username = (
+        db.query(Usuario)
+        .filter(func.lower(Usuario.username) == username_limpo.lower())
+        .first()
+    )
+    if db_username:
+        raise HTTPException(status_code=400, detail="Username já cadastrado")
+
+    validate_phone_or_raise(usuario.telefone)
+
     senha_criptografada = get_password_hash(usuario.senha)
 
     novo_usuario = Usuario(
-        username=usuario.username, dtNasc=usuario.dtNasc, senha=usuario.senha,
+        username=username_limpo, dtNasc=usuario.dtNasc, senha=senha_criptografada,
         email=usuario.email, nome=usuario.nome, sobrenome=usuario.sobrenome,
         telefone=usuario.telefone, bio="", foto_url=""
     )
@@ -231,6 +338,8 @@ async def atualizar_perfil(dados: UserUpdate, db: Session = Depends(get_db)):
     db_user = db.query(Usuario).filter(Usuario.ID == dados.id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    validate_phone_or_raise(dados.telefone)
     
     db_user.nome = dados.nome
     db_user.sobrenome = dados.sobrenome
@@ -246,17 +355,129 @@ async def atualizar_perfil(dados: UserUpdate, db: Session = Depends(get_db)):
 # --- 7. ROTAS DE POSTS E VOTOS ---
 
 @app.get("/posts")
-async def listar_posts(db: Session = Depends(get_db)):
-    posts = db.query(Post).all()
+async def listar_posts(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    posts = (
+        db.query(
+            Post.ID,
+            Post.conteudo,
+            Post.votos,
+            PostUsuario.usuario_id,
+            Usuario.username,
+            Usuario.foto_url,
+            PostSalvo.post_id.label("salvo_post_id"),
+        )
+        .join(PostUsuario, PostUsuario.post_id == Post.ID)
+        .join(Usuario, Usuario.ID == PostUsuario.usuario_id)
+        .outerjoin(
+            PostSalvo,
+            and_(
+                PostSalvo.post_id == Post.ID,
+                PostSalvo.usuario_id == user_id,
+            ),
+        )
+        .order_by(Post.ID.desc())
+        .all()
+    )
+
     return [{
-        "id": p.ID, "conteudo": p.conteudo, "votos": p.votos,
-        "autor": p.autor.username, "autor_id": p.autor.ID
-    } for p in posts]
+        "id": post.ID,
+        "conteudo": post.conteudo,
+        "votos": post.votos or 0,
+        "autor": post.username,
+        "autor_id": post.usuario_id,
+        "usuario_id": post.usuario_id,
+        "username": post.username,
+        "foto_url": post.foto_url or "",
+        "salvo": post.salvo_post_id is not None,
+    } for post in posts]
+
+
+@app.get("/posts/saved")
+async def listar_posts_salvos(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    posts = (
+        db.query(
+            Post.ID,
+            Post.conteudo,
+            Post.votos,
+            PostUsuario.usuario_id,
+            Usuario.username,
+            Usuario.foto_url,
+        )
+        .join(PostSalvo, and_(PostSalvo.post_id == Post.ID, PostSalvo.usuario_id == user_id))
+        .join(PostUsuario, PostUsuario.post_id == Post.ID)
+        .join(Usuario, Usuario.ID == PostUsuario.usuario_id)
+        .filter(PostSalvo.usuario_id == user_id)
+        .order_by(Post.ID.desc())
+        .all()
+    )
+
+    return [{
+        "id": post.ID,
+        "conteudo": post.conteudo,
+        "votos": post.votos or 0,
+        "autor": post.username,
+        "autor_id": post.usuario_id,
+        "usuario_id": post.usuario_id,
+        "username": post.username,
+        "foto_url": post.foto_url or "",
+        "salvo": True,
+    } for post in posts]
+
+
+@app.post("/posts")
+async def criar_post_autenticado(
+    dados: PostCreateAuth,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    conteudo_limpo = dados.conteudo.strip()
+    if not conteudo_limpo:
+        raise HTTPException(status_code=400, detail="Conteudo do post nao pode ser vazio")
+
+    ultimo_id = db.query(func.max(Post.ID)).scalar() or 0
+    novo_post_id = int(ultimo_id) + 1
+
+    novo_post = Post(ID=novo_post_id, conteudo=conteudo_limpo, votos=0)
+    db.add(novo_post)
+    db.flush()
+
+    relacionamento = PostUsuario(usuario_id=user_id, post_id=novo_post_id)
+    db.add(relacionamento)
+    db.commit()
+    db.refresh(novo_post)
+
+    autor = db.query(Usuario).filter(Usuario.ID == user_id).first()
+    return {
+        "id": novo_post_id,
+        "conteudo": novo_post.conteudo,
+        "votos": novo_post.votos or 0,
+        "usuario_id": user_id,
+        "username": autor.username if autor else "usuario",
+        "foto_url": autor.foto_url if autor else "",
+        "salvo": False,
+    }
 
 @app.post("/posts/criar")
 async def criar_post(dados: PostCreate, db: Session = Depends(get_db)):
-    novo_post = Post(conteudo=dados.conteudo, usuario_id=dados.usuario_id)
+    conteudo_limpo = dados.conteudo.strip()
+    if not conteudo_limpo:
+        raise HTTPException(status_code=400, detail="Conteudo do post nao pode ser vazio")
+
+    ultimo_id = db.query(func.max(Post.ID)).scalar() or 0
+    novo_post_id = int(ultimo_id) + 1
+
+    novo_post = Post(ID=novo_post_id, conteudo=conteudo_limpo, votos=0)
     db.add(novo_post)
+    db.flush()
+
+    relacionamento = PostUsuario(usuario_id=dados.usuario_id, post_id=novo_post_id)
+    db.add(relacionamento)
     db.commit()
     return {"message": "Post criado com sucesso"}
 
@@ -264,7 +485,79 @@ async def criar_post(dados: PostCreate, db: Session = Depends(get_db)):
 async def votar(post_id: int, tipo: str, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.ID == post_id).first()
     if not post: raise HTTPException(status_code=404)
-    if tipo == "up": post.votos += 1
-    elif tipo == "down": post.votos -= 1
+    if tipo == "up": post.votos = (post.votos or 0) + 1
+    elif tipo == "down": post.votos = (post.votos or 0) - 1
     db.commit()
     return {"votos": post.votos}
+
+
+@app.post("/posts/{post_id}/save")
+async def salvar_post(
+    post_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    post = db.query(Post).filter(Post.ID == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post não encontrado")
+
+    ja_salvo = (
+        db.query(PostSalvo)
+        .filter(PostSalvo.post_id == post_id, PostSalvo.usuario_id == user_id)
+        .first()
+    )
+
+    if ja_salvo:
+        return {"message": "Post já está salvo"}
+
+    salvo = PostSalvo(usuario_id=user_id, post_id=post_id)
+    db.add(salvo)
+    db.commit()
+    return {"message": "Post salvo com sucesso"}
+
+
+@app.delete("/posts/{post_id}/save")
+async def remover_post_salvo(
+    post_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    post = db.query(Post).filter(Post.ID == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post não encontrado")
+
+    salvo = (
+        db.query(PostSalvo)
+        .filter(PostSalvo.post_id == post_id, PostSalvo.usuario_id == user_id)
+        .first()
+    )
+    if not salvo:
+        return {"message": "Post não estava salvo"}
+
+    db.delete(salvo)
+    db.commit()
+    return {"message": "Post removido dos salvos"}
+
+
+@app.delete("/posts/{post_id}")
+async def remover_post(
+    post_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    post = db.query(Post).filter(Post.ID == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post não encontrado")
+
+    relacionamento = db.query(PostUsuario).filter(PostUsuario.post_id == post_id).first()
+    if not relacionamento:
+        raise HTTPException(status_code=404, detail="Autor do post não encontrado")
+
+    if int(relacionamento.usuario_id) != int(user_id):
+        raise HTTPException(status_code=403, detail="Sem permissão para remover este post")
+
+    db.query(PostSalvo).filter(PostSalvo.post_id == post_id).delete(synchronize_session=False)
+    db.query(PostUsuario).filter(PostUsuario.post_id == post_id).delete(synchronize_session=False)
+    db.delete(post)
+    db.commit()
+    return {"message": "Post removido com sucesso"}

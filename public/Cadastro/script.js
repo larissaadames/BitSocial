@@ -23,6 +23,22 @@ async function lerResposta(response) {
   }
 }
 
+const notificationContainer = document.getElementById("notification-container");
+
+function showNotification(message, type = "error") {
+  if (!notificationContainer) return;
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  notificationContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 500);
+  }, 4000);
+}
+
 // --- Mascara Telefone ---
 const telefone = document.getElementById("telefone");
 telefone.addEventListener("input", function (e) {
@@ -100,16 +116,57 @@ function toggleRule(el, isValid) {
   el.style.color = isValid ? "#2ecc71" : "#e74c3c";
 }
 
+function getCampoLabel(campo) {
+  if (!campo || !campo.id) return "campo";
+  const label = document.querySelector(`label[for="${campo.id}"]`);
+  return label ? label.textContent.trim().toLowerCase() : "campo";
+}
+
+function getMensagemCampoInvalido(campo) {
+  if (!campo || !campo.validity) {
+    return "Verifique os campos obrigatorios.";
+  }
+
+  const nomeCampo = getCampoLabel(campo);
+
+  if (campo.validity.valueMissing) {
+    return `Preencha o campo ${nomeCampo}.`;
+  }
+  if (campo.validity.typeMismatch) {
+    return `Informe um ${nomeCampo} valido.`;
+  }
+  if (campo.validity.patternMismatch) {
+    return campo.title || `Formato invalido para ${nomeCampo}.`;
+  }
+  if (campo.validity.tooShort) {
+    return `${nomeCampo.charAt(0).toUpperCase() + nomeCampo.slice(1)} muito curto.`;
+  }
+
+  return campo.title || "Verifique os dados informados.";
+}
+
 // --- Submissao do formulario ---
 const cadastroForm = document.getElementById("form-cadastro");
 
 cadastroForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
+  const primeiroCampoInvalido = Array.from(cadastroForm.elements).find((campo) => {
+    return typeof campo.checkValidity === "function" && !campo.checkValidity();
+  });
+
+  if (primeiroCampoInvalido) {
+    primeiroCampoInvalido.focus();
+    primeiroCampoInvalido.classList.add("input-invalid");
+    setTimeout(() => primeiroCampoInvalido.classList.remove("input-invalid"), 1200);
+    showNotification(getMensagemCampoInvalido(primeiroCampoInvalido), "error");
+    return;
+  }
+
   const telValue = document.getElementById("telefone").value;
   const regexTel = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
   if (!regexTel.test(telValue)) {
-    alert("Telefone invalido");
+    showNotification("Telefone invalido", "error");
     return;
   }
 
@@ -117,7 +174,7 @@ cadastroForm.addEventListener("submit", async function (e) {
   const s2 = document.getElementById("senha-confirmar").value;
 
   if (s1 !== s2) {
-    alert("As senhas nao coincidem!");
+    showNotification("As senhas nao coincidem!", "error");
     document.getElementById("senha-confirmar").focus();
     return;
   }
@@ -142,14 +199,16 @@ cadastroForm.addEventListener("submit", async function (e) {
     const data = await lerResposta(response);
 
     if (response.ok) {
-      alert("Usuario cadastrado com sucesso!");
-      window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
+      showNotification("Usuario cadastrado com sucesso!", "success");
+      setTimeout(() => {
+        window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
+      }, 900);
     } else {
       console.error("Erro de validacao:", data.detail);
-      alert("Erro no cadastro: " + (data.detail || "Verifique os campos."));
+      showNotification("Erro no cadastro: " + (data.detail || "Verifique os campos."), "error");
     }
   } catch (error) {
     console.error("Erro ao conectar com a API:", error);
-    alert("Erro de conexao com o servidor.");
+    showNotification("Erro de conexao com o servidor.", "error");
   }
 });

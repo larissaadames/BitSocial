@@ -20,6 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const dropdown = document.getElementById('user-dropdown');
     const logoutModal = document.getElementById('logout-modal');
     const inputTelefone = document.getElementById('edit-telefone');
+    const normalizeUsername = value => {
+        const cleaned = String(value || '').trim().replace(/^@+/, '');
+        return cleaned || 'usuario';
+    };
+    const formatUsername = value => `@${normalizeUsername(value)}`;
 
     // 3. SISTEMA DE NOTIFICAÇÕES (TOASTS)
     const showNotification = (message, type = 'success') => {
@@ -77,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const usuarios = await res.json();
                 resultsBox.innerHTML = usuarios.map(u => `
                     <div class="search-item" onclick="window.location.href='perfil.html?id=${u.id}'">
-                        <strong>@${u.username}</strong>
+                        <strong>${formatUsername(u.username)}</strong>
                         <span>${u.nome} ${u.sobrenome}</span>
                     </div>
                 `).join("");
@@ -106,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const u = await res.json();
 
             document.getElementById('display-nome-completo').textContent = `${u.nome} ${u.sobrenome}`;
-            document.getElementById('display-username').textContent = `@${u.username}`;
+            document.getElementById('display-username').textContent = formatUsername(u.username);
             document.getElementById('display-bio').textContent = u.bio || "> Sem biografia.";
             document.getElementById('display-telefone').textContent = u.telefone ? `📞 ${u.telefone}` : "";
             document.getElementById('display-dtNasc').textContent = u.dtNasc ? `🎂 ${u.dtNasc}` : "";
