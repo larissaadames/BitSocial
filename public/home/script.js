@@ -18,6 +18,13 @@ const APP_BASE_URL = (() => {
 })();
 
 document.addEventListener("DOMContentLoaded", async () => {
+    const userMenuWrapper = document.querySelector(".user-menu-wrapper");
+    const headerAvatar = document.getElementById("header-avatar");
+    const userDropdown = document.getElementById("user-dropdown");
+    const logoutTrigger = document.getElementById("btn-logout-trigger");
+    const logoutModal = document.getElementById("logout-modal");
+    const confirmLogoutBtn = document.getElementById("confirm-logout");
+    const cancelLogoutBtn = document.getElementById("cancel-logout");
     const navItems = document.querySelectorAll(".nav-item");
     const searchSection = document.querySelector(".search-section");
     const searchInput = document.getElementById("main-search");
@@ -34,6 +41,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const loggedUsername = localStorage.getItem("username") || "usuario";
     const token = localStorage.getItem("token");
     const MAX_POST_LENGTH = 500;
+    const normalizeUsername = value => {
+        const cleaned = String(value || "").trim().replace(/^@+/, "");
+        return cleaned || "usuario";
+    };
+    const formatUsername = value => `@${normalizeUsername(value)}`;
+    const EXAMPLE_POST = {
+        username: "davi cagnato",
+        conteudo:
+            "Alguem sabe como faz para debugar codigo Python no IntelliJ? Estou quebrando cabeca com breakpoints.",
+    };
     const LOGIN_PAGE_URL = `${APP_BASE_URL}/public/Login/login.html`;
     let activeFeedTarget = "home";
     let searchDebounceTimer;
@@ -45,12 +62,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (searchSection && !searchSection.contains(event.target)) {
             ocultarResultadosBusca();
         }
+
+        if (userDropdown && userMenuWrapper && !userMenuWrapper.contains(event.target)) {
+            userDropdown.style.display = "none";
+        }
+
+        if (logoutModal && event.target === logoutModal) {
+            logoutModal.style.display = "none";
+        }
     });
 
     const sessaoValida = await validarSessao();
     if (!sessaoValida) {
         return;
     }
+
+    configurarMenuUsuario();
+    carregarAvatarHeader();
 
     if (postCounter && postContentInput) {
         postCounter.textContent = `${postContentInput.value.length}/${MAX_POST_LENGTH}`;
@@ -156,7 +184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (activeFeedTarget === "home") {
                     adicionarPostNoTopo({
                         ...novoPost,
-                        username: novoPost.username || loggedUsername,
+                        username: normalizeUsername(novoPost.username || loggedUsername),
                         salvo: false,
                     });
                 }
@@ -175,6 +203,64 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     carregarPosts();
+
+    function configurarMenuUsuario() {
+        if (headerAvatar && userDropdown) {
+            headerAvatar.addEventListener("click", event => {
+                event.stopPropagation();
+                const isVisible = userDropdown.style.display === "flex";
+                userDropdown.style.display = isVisible ? "none" : "flex";
+            });
+        }
+
+        if (logoutTrigger && logoutModal) {
+            logoutTrigger.addEventListener("click", event => {
+                event.preventDefault();
+                if (userDropdown) {
+                    userDropdown.style.display = "none";
+                }
+                logoutModal.style.display = "flex";
+            });
+        }
+
+        if (cancelLogoutBtn && logoutModal) {
+            cancelLogoutBtn.addEventListener("click", () => {
+                logoutModal.style.display = "none";
+            });
+        }
+
+        if (confirmLogoutBtn && logoutModal) {
+            confirmLogoutBtn.addEventListener("click", () => {
+                logoutModal.style.display = "none";
+                encerrarSessaoEIrLogin();
+            });
+        }
+    }
+
+    async function carregarAvatarHeader() {
+        if (!headerAvatar) {
+            return;
+        }
+
+        headerAvatar.style.backgroundImage = "url('../img/bitPerfil.png')";
+
+        try {
+            const response = await fetch(`${APP_BASE_URL}/usuarios/${loggedUserId}`);
+            if (!response.ok) {
+                return;
+            }
+
+            const usuario = await response.json();
+            const fotoFinal =
+                usuario.foto_url && usuario.foto_url.length > 50
+                    ? usuario.foto_url
+                    : "../img/bitPerfil.png";
+
+            headerAvatar.style.backgroundImage = `url('${fotoFinal}')`;
+        } catch (error) {
+            console.error("Erro ao carregar avatar do cabecalho:", error);
+        }
+    }
 
     async function carregarPosts() {
         if (!feedScroll) {
@@ -232,14 +318,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         feedScroll.innerHTML = "";
 
         if (!posts.length) {
-            feedScroll.appendChild(
-                criarMensagemFeed(
-                    activeFeedTarget === "saved"
-                        ? "Nenhum post salvo ainda."
-                        : "Nenhum post publicado ainda.",
-                    "feed-empty"
-                )
-            );
+            if (activeFeedTarget === "saved") {
+                feedScroll.appendChild(
+                    criarMensagemFeed("Nenhum post salvo ainda.", "feed-empty")
+                );
+            } else {
+                feedScroll.appendChild(
+                    criarMensagemFeed("Nenhum post publicado ainda.", "feed-empty")
+                );
+
+                const exemploCard = criarCardPostExemplo();
+                feedScroll.appendChild(exemploCard);
+                configurarVotacao(exemploCard);
+            }
             return;
         }
 
@@ -321,10 +412,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const avatar = document.createElement("div");
         avatar.className = "post-user-avatar";
+        const fotoAutor =
+            post.foto_url && post.foto_url.length > 50
+                ? post.foto_url
+                : "../img/bitPerfil.png";
+        avatar.style.backgroundImage = `url('${fotoAutor}')`;
 
         const username = document.createElement("span");
         username.className = "post-user-name";
-        username.textContent = `@${post.username || "usuario"}`;
+        username.textContent = formatUsername(post.username);
 
         userMeta.appendChild(avatar);
         userMeta.appendChild(username);
@@ -511,6 +607,83 @@ document.addEventListener("DOMContentLoaded", async () => {
         return elemento;
     }
 
+    function criarCardPostExemplo() {
+        const card = document.createElement("article");
+        card.className = "post-card post-enter";
+        card.style.animationDelay = "0ms";
+
+        const header = document.createElement("header");
+        header.className = "post-header";
+
+        const userMeta = document.createElement("div");
+        userMeta.className = "post-user-meta";
+
+        const avatar = document.createElement("div");
+        avatar.className = "post-user-avatar";
+        avatar.style.backgroundImage = "url('../img/bitPerfil.png')";
+
+        const username = document.createElement("span");
+        username.className = "post-user-name";
+        username.textContent = formatUsername(EXAMPLE_POST.username);
+
+        const exampleBadge = document.createElement("span");
+        exampleBadge.className = "post-example-badge";
+        exampleBadge.textContent = "EXEMPLO";
+
+        userMeta.appendChild(avatar);
+        userMeta.appendChild(username);
+        header.appendChild(userMeta);
+        header.appendChild(exampleBadge);
+
+        const contentBox = document.createElement("div");
+        contentBox.className = "post-content-box";
+
+        const contentText = document.createElement("p");
+        contentText.className = "post-text";
+        contentText.textContent = EXAMPLE_POST.conteudo;
+        contentBox.appendChild(contentText);
+
+        const footer = document.createElement("footer");
+        footer.className = "post-footer";
+
+        const votes = document.createElement("div");
+        votes.className = "post-votes";
+        votes.innerHTML = [
+            '<div class="vote-arrow upvote" aria-label="Upvote"></div>',
+            '<span class="vote-count">0</span>',
+            '<div class="vote-arrow downvote" aria-label="Downvote"></div>'
+        ].join("");
+
+        const socialActions = document.createElement("div");
+        socialActions.className = "post-social-actions";
+
+        const shareButton = document.createElement("button");
+        shareButton.type = "button";
+        shareButton.className = "post-action-btn share-action-btn";
+        shareButton.disabled = true;
+        shareButton.title = "Post de exemplo";
+        shareButton.innerHTML = "&#10548;";
+
+        const saveButton = document.createElement("button");
+        saveButton.type = "button";
+        saveButton.className = "post-action-btn save-flag-btn";
+        saveButton.disabled = true;
+        saveButton.title = "Post de exemplo";
+        saveButton.innerHTML = "&#9873;";
+
+        socialActions.appendChild(shareButton);
+        socialActions.appendChild(saveButton);
+
+        footer.appendChild(votes);
+        footer.appendChild(socialActions);
+
+        card.appendChild(header);
+        card.appendChild(contentBox);
+        card.appendChild(footer);
+
+        return card;
+    }
+
     async function removerPost(postId, postCard, deleteButton) {
         if (!token) {
             alert("Voce precisa estar logado para excluir posts.");
@@ -635,7 +808,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function compartilharPost(post, shareButton) {
-        const textoCompartilhamento = `@${post.username || "usuario"}: ${post.conteudo || ""}`;
+        const textoCompartilhamento = `${formatUsername(post.username)}: ${post.conteudo || ""}`;
 
         try {
             if (navigator.share) {
@@ -825,7 +998,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             item.type = "button";
             item.className = "search-result-item";
             item.innerHTML = [
-                `<span class="search-result-username">@${usuario.username || "usuario"}</span>`,
+                `<span class="search-result-username">${formatUsername(usuario.username)}</span>`,
                 `<span class="search-result-name">${(usuario.nome || "")} ${(usuario.sobrenome || "")}</span>`,
             ].join("");
 

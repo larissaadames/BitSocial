@@ -8,86 +8,101 @@
 </head>
 <body class="dark-theme">
 
+    <div id="notification-container"></div>
+
     <header class="app-header">
         <div class="header-container">
-            <a href="../home/index.html" class="logo-section">
+            <a href="../home/index.html" class="logo-section logo-link">
                 <span class="logo-text">Social</span>
-                <img src="../img/bitLampada.png" alt="Logo BitSocial" class="logo-icon-img">
+                <img src="../img/bitLampada.png" alt="Logo SocialBit" class="logo-icon-img">
             </a>
+            
             <div class="search-section">
-                <input type="text" placeholder="Pesquisar usuários..." class="search-bar" id="main-search">
-                <div class="search-results" id="search-results"></div>
+                <input type="text" placeholder="Pesquisar usuários..." class="search-bar" id="search-bar">
+                <div id="search-results" class="search-results"></div>
             </div>
-            <a href="perfil.html" class="user-section">
-                <div class="header-user-avatar"></div>
-            </a>
+
+            <div class="user-menu-wrapper">
+                <div class="header-user-avatar" id="header-avatar"></div>
+                
+                <div id="user-dropdown" class="dropdown-menu">
+                    <a href="perfil.html" class="dropdown-item">Acessar Perfil</a>
+                    <button id="btn-logout-trigger" class="dropdown-item logout-style">Sair</button>
+                </div>
+            </div>
         </div>
     </header>
 
     <main class="main-content">
         <div class="profile-container">
-            
             <section class="profile-card">
-                <div class="profile-header-main">
-                    <div class="profile-avatar-large" id="display-avatar"></div>
+                <div class="profile-main-info">
+                    <div class="avatar-wrapper" id="avatar-wrapper">
+                        <div class="profile-avatar-large" id="display-avatar"></div>
+                        <div class="avatar-overlay" id="avatar-overlay">Trocar Foto</div>
+                    </div>
                     
-                    <div class="profile-view-mode" id="view-mode">
+                    <div id="view-mode" class="info-text-section">
                         <h1 id="display-nome-completo">Carregando...</h1>
                         <p id="display-username">@usuario</p>
-                        
-                        <div class="bio-container">
-                            <p id="display-bio">> Olá, mundo! Bem-vindo ao meu perfil.</p>
+                        <div class="bio-box">
+                            <p id="display-bio">> Olá! Bem-vindo ao meu SocialBit.</p>
                         </div>
-
-                        <button id="btn-edit-perfil" class="btn-edit">Editar Perfil</button>
+                        <div class="extra-info">
+                            <span id="display-telefone" class="info-item"></span>
+                            <span id="display-dtNasc" class="info-item"></span>
+                        </div>
+                        <button id="btn-edit-perfil" class="btn-primary" style="display: none;">Editar Perfil</button>
                     </div>
 
-                    <div class="profile-edit-mode" id="edit-mode">
-                        <h2 class="edit-title">Editar Informações</h2>
-                        
-                        <div class="edit-group">
-                            <label for="edit-nome">Nome</label>
-                            <input type="text" id="edit-nome" placeholder="Seu nome">
+                    <div id="edit-mode" class="info-edit-section" style="display: none;">
+                        <h2 class="edit-title">Atualizar Perfil</h2>
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <label>Nome</label>
+                                <input type="text" id="edit-nome" maxlength="50">
+                            </div>
+                            <div class="input-wrapper">
+                                <label>Sobrenome</label>
+                                <input type="text" id="edit-sobrenome" maxlength="50">
+                            </div>
                         </div>
-
-                        <div class="edit-group">
-                            <label for="edit-sobrenome">Sobrenome</label>
-                            <input type="text" id="edit-sobrenome" placeholder="Seu sobrenome">
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <label>Telefone</label>
+                                <input type="text" id="edit-telefone" placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="input-wrapper">
+                                <label>Data de Nascimento</label>
+                                <input type="date" id="edit-dtNasc">
+                            </div>
                         </div>
-
-                        <div class="edit-group">
-                            <label for="edit-bio">Bio (Biografia)</label>
-                            <textarea id="edit-bio" rows="4" placeholder="Fale um pouco sobre você ou seus bugs favoritos..."></textarea>
+                        <div class="input-wrapper">
+                            <label>Biografia (Máx. 255 caracteres)</label>
+                            <textarea id="edit-bio" maxlength="255"></textarea>
                         </div>
-
                         <div class="edit-actions">
                             <button id="btn-save-perfil" class="btn-save">Salvar Alterações</button>
-                            <button onclick="window.location.reload()" class="btn-cancel">Cancelar</button>
+                            <button id="btn-cancel-edit" class="btn-cancel">Cancelar</button>
                         </div>
                     </div>
                 </div>
             </section>
-
-            <section class="profile-content-card">
-                <nav class="profile-tabs" id="profile-tabs">
-                    <button class="profile-tab active" data-tab="overview" type="button">Overview</button>
-                    <button class="profile-tab" data-tab="posts" type="button">Posts</button>
-                    <button class="profile-tab" data-tab="saved" type="button">Saved</button>
-                </nav>
-
-                <div class="profile-toolbar">
-                    <a href="../home/index.html" class="btn-create-post is-hidden" id="btn-create-post" hidden aria-hidden="true" style="display: none;">+ Create Post</a>
-                    <p class="profile-feed-caption" id="profile-feed-caption">Mostrando posts recentes</p>
-                </div>
-
-                <div class="profile-posts-list" id="profile-posts-list">
-                    <p class="profile-loading">Carregando posts...</p>
-                </div>
-            </section>
-
         </div>
     </main>
 
-    <script src="script.js?v=20260419b"></script>
+    <div id="logout-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Deseja mesmo sair?</h3>
+            <p>Você precisará fazer login novamente para postar e votar.</p>
+            <div class="modal-actions">
+                <button id="confirm-logout" class="btn-confirm">Sim, Sair</button>
+                <button id="cancel-logout" class="btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" accept="image/*" style="display: none;">
+    <script src="script.js"></script>
 </body>
 </html>

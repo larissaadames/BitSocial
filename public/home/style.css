@@ -11,6 +11,7 @@
   --border-color: #333; /* Cor das bordas finas */
   --upvote-color: #ff4d4d; /* Vermelho para Upvote */
   --downvote-color: #7b2ff7; /* Roxo para Downvote */
+    --error-red: #ff4d4d;
 }
 
 /* 2. Configurações Base do Projeto */
@@ -91,10 +92,11 @@ button,
     min-width: 0;
 }
 
-.user-link,
-.user-section {
+.user-menu-wrapper {
     display: inline-flex;
     flex: 0 0 auto;
+    position: relative;
+    justify-content: flex-end;
 }
 
 .logo-text { 
@@ -196,7 +198,76 @@ button,
     background-size: cover; 
     background-position: center;
     border: 2px solid var(--border-color); /* Bordas do avatar */
+    cursor: pointer;
 }
+
+.dropdown-menu {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    background-color: #181818;
+    border: 2px solid var(--accent-purple);
+    border-radius: 10px;
+    width: 200px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    z-index: 2000;
+}
+
+.dropdown-item {
+    padding: 15px 20px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.dropdown-item:hover { background-color: var(--accent-purple); }
+.dropdown-item.logout-style { border-top: 1px solid #333; color: var(--error-red); }
+.dropdown-item.logout-style:hover { background-color: var(--error-red); color: white; }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #1e1e1e;
+    border: 2px solid var(--accent-purple);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h3 { font-size: 24px; margin-bottom: 15px; color: var(--accent-purple); }
+.modal-content p { color: #aaa; margin-bottom: 30px; font-size: 14px; }
+.modal-actions { display: flex; gap: 15px; justify-content: center; }
+.btn-confirm { background-color: var(--error-red); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.btn-cancel { background-color: #444; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
 /* --- GRID DA HOME --- */
 .main-content { 
@@ -556,6 +627,8 @@ button,
     background-color: #D9D9D9; 
     border-radius: 50%; 
     border: 2px solid var(--border-color);
+    background-size: cover;
+    background-position: center;
 }
 
 .post-user-name { 
@@ -564,6 +637,20 @@ button,
     color: #fff; 
     overflow-wrap: anywhere;
     word-break: break-word;
+}
+
+.post-example-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(123, 47, 247, 0.45);
+    background: rgba(123, 47, 247, 0.15);
+    color: #d9c4ff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
 }
 
 .post-content-box { 

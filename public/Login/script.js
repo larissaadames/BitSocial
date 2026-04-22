@@ -23,6 +23,22 @@ async function lerResposta(response) {
   }
 }
 
+const notificationContainer = document.getElementById("notification-container");
+
+function showNotification(message, type = "error") {
+  if (!notificationContainer) return;
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  notificationContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 500);
+  }, 4000);
+}
+
 function togglePassword() {
   const input = document.getElementById("password");
 
@@ -52,8 +68,10 @@ const loginForm = document.querySelector("form");
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const email = document.querySelector('input[type="email"]').value;
-  const senha = document.querySelector('input[type="password"]').value;
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const email = emailInput ? emailInput.value : "";
+  const senha = passwordInput ? passwordInput.value : "";
 
   try {
     const response = await fetch(`${APP_BASE_URL}/login`, {
@@ -81,11 +99,14 @@ loginForm.addEventListener("submit", async (event) => {
         window.location.href = `${APP_BASE_URL}/public/perfil/perfil.html`;
         
     } else {
-      alert("Falha no login: " + (data.detail || "E-mail ou senha incorretos."));
+      showNotification(
+        "Falha no login: " + (data.detail || "E-mail ou senha incorretos."),
+        "error"
+      );
     }
   } catch (error) {
     console.error("Erro ao conectar com a API:", error);
-    alert("Erro no servidor. Verifique se o Uvicorn esta rodando.");
+    showNotification("Erro no servidor. Verifique se o Uvicorn esta rodando.", "error");
   }
 });
 
