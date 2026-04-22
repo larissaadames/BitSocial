@@ -32,12 +32,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     const formatUsername = value => `@${normalizeUsername(value)}`;
 
-    // --- CONFIGURAÇÃO DA IDADE MÍNIMA (16 ANOS) ---
+    // --- CONFIGURAÇÃO DA IDADE MÍNIMA E MÁXIMA ---
     const hoje = new Date();
+    
+    // 16 anos
     const dataMinima16 = new Date();
     dataMinima16.setFullYear(hoje.getFullYear() - 16);
-    const dataLimite = dataMinima16.toISOString().split('T')[0];
-    if (inputDataNasc) inputDataNasc.max = dataLimite;
+    const dataLimiteMax = dataMinima16.toISOString().split('T')[0];
+
+    // 140 anos 
+    const dataMaxima140 = new Date();
+    dataMaxima140.setFullYear(hoje.getFullYear() - 140);
+    const dataLimiteMin = dataMaxima140.toISOString().split('T')[0];
+
+    // Aplica as duas travas no input HTML
+    if (inputDataNasc) {
+        inputDataNasc.max = dataLimiteMax; // Ninguém mais novo que 16 anos
+        inputDataNasc.min = dataLimiteMin; // Ninguém mais velho que 140 anos
+    }
 
     // 3. SISTEMA DE NOTIFICAÇÕES
     const showNotification = (message, type = 'success') => {
@@ -153,10 +165,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const telefoneVal = inputTelefone.value.trim();
         const dtNascVal = inputDataNasc.value;
         
-        
         if (!regexNome.test(nome)) {
-        showNotification("O nome deve ter entre 2 e 25 letras (sem números ou símbolos).", "error");
-        return;
+            showNotification("O nome deve ter entre 2 e 25 letras (sem números ou símbolos).", "error");
+            return;
         }
 
         if (!regexSobrenome.test(sobrenome)) {
@@ -170,9 +181,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (dtNascVal && new Date(dtNascVal) > dataMinima16) {
-            showNotification("Você precisa ter pelo menos 16 anos.", "error");
-            return;
+        // --- NOVA VALIDAÇÃO DE IDADE (À Prova de Digitação) ---
+        if (dtNascVal) {
+            const dataDigitada = new Date(dtNascVal);
+            if (dataDigitada > dataMinima16) {
+                showNotification("Você precisa ter pelo menos 16 anos.", "error");
+                return;
+            }
+            if (dataDigitada < dataMaxima140) {
+                showNotification("Ano de nascimento inválido. Verifique a digitação.", "error");
+                return;
+            }
         }
 
         // BLOQUEIO DO BOTÃO PARA EVITAR MULTI-CLICKS
