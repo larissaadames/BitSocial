@@ -411,8 +411,23 @@ async def atualizar_perfil(dados: UserUpdate, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
+    # 1. Validação de Telefone (Já existente no seu código)
     validate_phone_or_raise(dados.telefone)
     
+    # 2. Validação de Nome e Sobrenome
+    if len(dados.nome.strip()) < 2 or len(dados.sobrenome.strip()) < 2:
+        raise HTTPException(status_code=400, detail="Nome e sobrenome muito curtos.")
+
+    # 3. Validação de Idade (16 anos)
+    try:
+        data_nasc = datetime.strptime(dados.dtNasc, "%Y-%m-%d")
+        idade = (datetime.now() - data_nasc).days // 365
+        if idade < 16:
+            raise HTTPException(status_code=400, detail="Idade mínima de 16 anos não atingida.")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Formato de data inválido.")
+
+    # Se passar em tudo, atualiza o banco
     db_user.nome = dados.nome
     db_user.sobrenome = dados.sobrenome
     db_user.bio = dados.bio
