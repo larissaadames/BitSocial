@@ -41,14 +41,17 @@ function showNotification(message, type = "error") {
 
 function togglePassword() {
   const input = document.getElementById("password");
+  const eyeBtn = event.currentTarget; 
 
   if (input.type === "password") {
     input.type = "text";
-    input.style.fontFamily = '"Orbitron", sans-serif';
+    eyeBtn.textContent = "🔒";
   } else {
     input.type = "password";
-    input.style.fontFamily = '"Segoe UI", sans-serif';
+    eyeBtn.textContent = "👁";
   }
+  
+  input.focus();
 }
 
 // Animação do fundo geométrico
@@ -65,50 +68,61 @@ if (bg) {
 
 const loginForm = document.querySelector("form");
 
-loginForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
+if (loginForm) {
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const email = emailInput ? emailInput.value : "";
-  const senha = passwordInput ? passwordInput.value : "";
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
 
-  try {
-    const response = await fetch(`${APP_BASE_URL}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: email, senha: senha }),
-    });
+    // Captura os valores no exato momento do envio
+    const email = emailInput ? emailInput.value.trim() : "";
+    const senha = passwordInput ? passwordInput.value : "";
 
-    const data = await lerResposta(response);
+    // Validação de segurança antes de chamar a API
+    if (!email || !senha) {
+      showNotification("Por favor, preencha todos os campos.", "error");
+      return;
+    }
 
-    if (response.ok) {
-        // --- MUDANÇAS AQUI: Persistindo a sessão para o Perfil e Home ---
+    try {
+      const response = await fetch(`${APP_BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email, senha: senha }),
+      });
+
+      const data = await lerResposta(response);
+
+      if (response.ok) {
+        showNotification("Login realizado com sucesso!", "success");
+
+        // Persistência dos dados da sessão
+        const accessToken = data.access_token || data.token;
+        if (accessToken) localStorage.setItem("token", accessToken);
         
-      // Mantemos o token para ações autenticadas no feed.
-      const accessToken = data.access_token || data.token;
-      if (accessToken) localStorage.setItem("token", accessToken);
-        
-        // Salvamos o ID e Username (essenciais para as rotas que criamos no main.py)
         localStorage.setItem("userId", data.id);
         localStorage.setItem("username", data.username);
         
-        // Redirecionamento original mantido
-        window.location.href = `${APP_BASE_URL}/public/perfil/perfil.html`;
+        // Redirecionamento para o perfil após um pequeno delay para mostrar o brinde
+        setTimeout(() => {
+          window.location.href = `../perfil/perfil.html`;
+        }, 1000);
         
-    } else {
-      showNotification(
-        "Falha no login: " + (data.detail || "E-mail ou senha incorretos."),
-        "error"
-      );
+      } else {
+        showNotification(
+          data.detail || "E-mail ou senha incorretos.",
+          "error"
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao conectar com a API:", error);
+      showNotification("Erro no servidor. Verifique se o backend está ativo.", "error");
     }
-  } catch (error) {
-    console.error("Erro ao conectar com a API:", error);
-    showNotification("Erro no servidor. Verifique se o Uvicorn esta rodando.", "error");
-  }
-});
+  });
+}
 
 // const token = localStorage.getItem("token");
 

@@ -335,8 +335,8 @@ body.dark-theme {
 /* MODO EDIÇÃO */
 .info-edit-section { flex: 1; }
 .edit-title { font-size: 28px; margin-bottom: 30px; color: var(--accent-purple); }
-.input-group { display: flex; gap: 20px; margin-bottom: 20px; }
-.input-wrapper { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.input-group { display: flex; gap: 20px; margin-bottom: 20px; width: 100%;}
+.input-wrapper { display: flex; flex-direction: column; gap: 10px; width: 100%; min-width: 0;}
 .input-wrapper label { font-size: 13px; font-weight: 800; color: var(--accent-purple); text-transform: uppercase; }
 
 .info-edit-section input, 
@@ -349,6 +349,8 @@ body.dark-theme {
     font-size: 16px;
     outline: none;
     transition: border-color 0.3s;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .info-edit-section input:focus, 
@@ -493,5 +495,35 @@ body.dark-theme {
     .avatar-wrapper {
         width: 160px;
         height: 160px;
+    }
+}
+
+/* Ajuste para telas de telemóveis */
+@media (max-width: 600px) {
+    .input-group {
+        flex-direction: column;
+        gap: 15px; 
+    }
+
+
+    .info-edit-section {
+        width: 100%;
+        padding: 0;
+    }
+
+   
+    .edit-title {
+        text-align: center;
+        font-size: 22px;
+    }
+
+    .edit-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-save, .btn-cancel, .btn-danger {
+        width: 100%;
+        margin-left: 0;
     }
 }
