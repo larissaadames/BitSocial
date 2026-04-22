@@ -1,12 +1,11 @@
 import pymysql
-import os
 
 # Configuração do banco de dados (Mantive seus dados originais)
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", "root"),
-    "database": os.getenv("DB_NAME", "SocialBit"),
+    "host": "localhost",
+    "user": "root",
+    "password": "root",
+    "database": "SocialBit",
     "cursorclass": pymysql.cursors.DictCursor # Adicionado para facilitar a leitura dos dados
 }
 

@@ -88,4 +88,5 @@ VALUES (1, 'teste@gmail.com', '123456testeTESTE@!', 'testador', 'Teste');
 
 
 ALTER TABLE Usuario ADD COLUMN bio TEXT;
+ALTER TABLE Usuario MODIFY COLUMN foto_url LONGTEXT;
 SELECT * FROM Usuario;
