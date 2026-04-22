@@ -232,6 +232,7 @@ body.dark-theme {
 
 .btn-confirm { background-color: var(--error-red); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 .btn-cancel { background-color: #444; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.btn-danger {background-color: var(--error-red); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer;}
 
 /* --- CONTEÚDO PRINCIPAL (CARD DE PERFIL) --- */
 .main-content {
@@ -363,142 +364,89 @@ body.dark-theme {
 .btn-save { background-color: var(--success-green); color: white; border: none; padding: 14px 35px; border-radius: 10px; cursor: pointer; font-weight: 700; }
 .btn-cancel { background-color: #444; color: white; border: none; padding: 14px 35px; border-radius: 10px; cursor: pointer; font-weight: 700; }
 
+/* Botão de Exclusão */
+.btn-danger {
+    background-color: transparent;
+    color: var(--error-red);
+    border: 1px solid var(--error-red);
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.btn-danger:hover {
+    background-color: var(--error-red);
+    color: white;
+}
+
+
+.btn-confirm-danger {
+    background-color: var(--error-red);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.error-text {
+    color: var(--error-red);
+    margin-bottom: 10px;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.delete-modal-content {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.danger-text {
+    color: var(--error-red);
+    margin-bottom: 15px;
+}
+
+.delete-modal-content p {
+    color: var(--text-label);
+    margin-bottom: 25px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
 /* --- RESPONSIVIDADE PERFIL --- */
-
-@media (max-width: 900px) {
-    .profile-main-info {
-        flex-direction: column;
-        align-items: center;
-        gap: 40px;
-        text-align: center;
-    }
-
-    .bio-box {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .info-text-section h1 {
-        font-size: 32px;
-        flex: 1; 
-        min-width: 0; 
-        max-width: 100%;
-        overflow: hidden; 
-    }
-
-    .extra-info {
-        align-items: center;
-    }
-
-    .input-group {
-        flex-direction: column; /* Inputs de edição ficam um embaixo do outro */
-    }
-}
-
-@media (max-width: 980px) {
-    .app-header {
-        height: auto;
-        padding: 8px 10px;
-    }
-
-    .header-container {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .logo-section {
-        flex: 0 1 auto;
-        max-width: 46%;
-    }
-
-    .search-section {
-        flex: 1 1 auto;
-        min-width: 110px;
-        max-width: none;
-        width: auto;
-    }
-
-    .search-bar,
-    .search-results {
-        width: 100%;
-    }
-
-    .logo-text {
-        font-size: clamp(16px, 4.2vw, 22px);
-    }
-
-    .logo-icon-img {
-        height: clamp(22px, 4.8vw, 32px);
-    }
-
-    .header-user-avatar {
-        width: clamp(30px, 4.6vw, 34px);
-        height: clamp(30px, 4.6vw, 34px);
-    }
-
-    .search-bar {
-        padding: 8px 10px;
-        font-size: clamp(12px, 2.1vw, 14px);
-    }
-}
-
-@media (max-width: 720px) {
-    .logo-text {
-        font-size: 22px;
-    }
-
-    .logo-icon-img {
-        height: 32px;
-    }
-}
-
-@media (max-width: 600px) {
-    .profile-card {
-        padding: 30px 20px;
-    }
-
-    .profile-avatar-large {
-        width: 160px;
-        height: 160px;
-    }
-
-    .avatar-overlay {
-        width: 160px;
-        height: 160px;
-    }
-}
-
-@media (max-width: 520px) {
-    .app-header {
-        padding: 9px 10px;
-    }
-}
-
-@media (max-width: 360px) {
-    .app-header {
-        padding: 8px;
-    }
-
-    .logo-text {
-        font-size: 19px;
-    }
-
-    .logo-icon-img {
-        height: 28px;
-    }
-
-    .header-user-avatar {
-        width: 32px;
-        height: 32px;
-    }
-
-    .search-bar {
-        padding: 9px 11px;
-        font-size: 13px;
-    }
-}
 
 @media (max-width: 900px) {
 

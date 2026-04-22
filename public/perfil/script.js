@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (userIdToFetch == loggedUserId) {
                 document.getElementById('btn-edit-perfil').style.display = 'block';
-                // document.getElementById('avatar-overlay').style.display = 'flex';
+                //document.getElementById('avatar-overlay').style.display = 'flex';
                 document.getElementById('edit-nome').value = u.nome;
                 document.getElementById('edit-sobrenome').value = u.sobrenome;
                 document.getElementById('edit-bio').value = u.bio || "";
@@ -132,97 +132,113 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // 9. SALVAR ALTERAÇÕES
-const avatarOverlay = document.getElementById('avatar-overlay');
-    const avatarWrapper = document.getElementById('avatar-wrapper');
-
-   // Função para alternar entre ver e editar
-    const alternarModoEdicao = (editando) => {
-        document.getElementById('view-mode').style.display = editando ? 'none' : 'block';
-        document.getElementById('edit-mode').style.display = editando ? 'block' : 'none';
-        
-        const wrapper = document.getElementById('avatar-wrapper');
-        if (editando) {
-            // Adiciona a classe que libera o hover no CSS
-            wrapper.classList.add('modo-edicao');
-        } else {
-            // Remove a classe para travar o hover
-            wrapper.classList.remove('modo-edicao');
-        }
-    };
-
-    document.getElementById('btn-edit-perfil').addEventListener('click', () => alternarModoEdicao(true));
-    document.getElementById('btn-cancel-edit').addEventListener('click', () => window.location.reload());
-
-    // Clique na foto (Só funciona se estiver editando)
-    avatarWrapper.addEventListener('click', () => {
-        const estaEditando = document.getElementById('edit-mode').style.display === 'block';
-        if (estaEditando) {
-            document.getElementById('file-input').click();
-        }
-    });
-
-    // Quando escolher o arquivo
-    document.getElementById('file-input').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const base64 = ev.target.result;
-                // Atualiza a imagem na tela na hora
-                document.getElementById('display-avatar').style.backgroundImage = `url('${base64}')`;
-                document.getElementById('header-avatar').style.backgroundImage = `url('${base64}')`;
-                
-                // Salva a foto imediatamente chamando a função de salvar
-                salvarDadosPerfil(base64);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Função central para salvar tudo
-    const salvarDadosPerfil = async (fotoParaSalvar = null) => {
+    const salvarAlteracoes = async (novaFoto = null) => {
         const nome = document.getElementById('edit-nome').value.trim();
+        const telefone = inputTelefone.value.trim();
         
-        // Se o campo nome estiver vazio e não estivermos apenas trocando a foto, avisar
-        if (!nome && !fotoParaSalvar) {
-            showNotification("O nome é obrigatório", "error");
+        if (nome.length < 2) {
+            showNotification("Nome inválido.", "error");
             return;
         }
 
-        const payload = {
+        const dados = {
             id: parseInt(loggedUserId),
-            nome: nome || document.getElementById('display-nome-completo').textContent.split(' ')[0],
-            sobrenome: document.getElementById('edit-sobrenome').value.trim(),
+            nome: nome,
+            sobrenome: document.getElementById('edit-sobrenome').value,
             bio: document.getElementById('edit-bio').value,
-            telefone: inputTelefone.value.trim(),
+            telefone: telefone,
             dtNasc: document.getElementById('edit-dtNasc').value,
-            foto_url: fotoParaSalvar // Se for null, o backend mantém a foto atual
+            foto_url: novaFoto
         };
 
         try {
             const res = await fetch(`${APP_BASE_URL}/usuarios/update`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
+                body: JSON.stringify(dados)
             });
-
             if (res.ok) {
-                showNotification("Perfil atualizado!", "success");
-                // Se NÃO for apenas troca de foto, recarrega a página
-                if (!fotoParaSalvar) {
-                    setTimeout(() => window.location.reload(), 1000);
-                }
-            } else {
-                showNotification("Erro ao salvar no servidor", "error");
+                showNotification("Sucesso!");
+                if (!novaFoto) setTimeout(() => window.location.reload(), 1000);
             }
-        } catch (error) {
-            showNotification("Erro de conexão", "error");
-        }
+        } catch (e) { showNotification("Erro ao salvar.", "error"); }
     };
 
-    // Botão Salvar Geral
-    document.getElementById('btn-save-perfil').addEventListener('click', () => salvarDadosPerfil());
+    // 10. UPLOAD DE FOTO
+    document.getElementById('avatar-wrapper').addEventListener('click', () => {
+        if (userIdToFetch == loggedUserId) document.getElementById('file-input').click();
+    });
 
+    document.getElementById('file-input').addEventListener('change', (e) => {
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+            const base64 = ev.target.result;
+            displayAvatar.style.backgroundImage = `url('${base64}')`;
+            headerAvatar.style.backgroundImage = `url('${base64}')`;
+            await salvarAlteracoes(base64);
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    });
+
+    document.getElementById('btn-save-perfil').addEventListener('click', () => salvarAlteracoes());
+    document.getElementById('btn-edit-perfil').addEventListener('click', () => {
+        document.getElementById('view-mode').style.display = 'none';
+        document.getElementById('edit-mode').style.display = 'block';
+    });
+    document.getElementById('btn-cancel-edit').addEventListener('click', () => window.location.reload());
+    
     carregarHeader();
-    carregarPerfil();
+    carregarPerfil();  
+
+    // --- 11. LÓGICA DE EXCLUSÃO DE CONTA ---
+    // --- LÓGICA DE ELIMINAÇÃO DE CONTA ---
+    const deleteBtn = document.getElementById('delete-account-btn');
+    const deleteModal = document.getElementById('delete-modal');
+    const confirmDeleteBtn = document.getElementById('confirm-delete');
+    const cancelDeleteBtn = document.getElementById('cancel-delete');
+
+    if (deleteBtn) {
+        // Abrir o modal
+        deleteBtn.addEventListener('click', () => {
+            deleteModal.style.display = 'flex';
+        });
+
+        // Fechar o modal
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModal.style.display = 'none';
+        });
+
+        // Confirmar e enviar para o servidor
+        confirmDeleteBtn.addEventListener('click', async () => {
+            try {
+                // Usa o APP_BASE_URL que já definiste no topo
+                const res = await fetch(`${APP_BASE_URL}/usuarios/${loggedUserId}`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    showNotification("Conta eliminada com sucesso.", "success");
+                    
+                    // 1. Limpa tudo explicitamente
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('access_token');
+                    localStorage.clear(); 
+
+                    // 2. Aguarda e redireciona
+                    setTimeout(() => {
+                        window.location.href = "../Login/login.html";
+                    }, 2000);
+                } else {
+                    showNotification("Erro ao comunicar com o servidor.", "error");
+                }
+            } catch (e) {
+                console.error("Erro de conexão:", e);
+                showNotification("Erro de conexão com o servidor.", "error");
+            } finally {
+                deleteModal.style.display = 'none';
+            }
+        });
+    }
+   
 });

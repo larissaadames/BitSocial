@@ -9,9 +9,11 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from urllib.parse import quote_plus
+from dotenv import load_dotenv
 import hashlib
 import os
 import re
+import requests
 
 # --- 1. CONFIGURAÇÃO DO BANCO DE DADOS ---
 # Variaveis de ambiente permitem ajustar acesso sem editar o codigo.
@@ -27,6 +29,8 @@ SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:PUC%401234@localhost/socialbit"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+load_dotenv()
 
 # --- 2. MODELOS DO BANCO (USUÁRIOS E POSTS) ---
 
@@ -218,13 +222,55 @@ def verify_password(plain_password: str, stored_password: str) -> bool:
     return plain_password == stored_password
 
 
+
 def validate_phone_or_raise(phone: str):
-    if phone and not PHONE_REGEX.fullmatch(phone.strip()):
+    print(f"--- INICIANDO VALIDAÇÃO PARA O TELEFONE: {phone} ---")
+    if not phone or not phone.strip():
+        print("Telefone vazio, pulando...")
+        return  # Se for vazio e a bio permitir, apenas ignora
+    
+    telefone_limpo = phone.strip()
+    
+    # 1. Validação Visual Básica (A que você já tinha)
+    if not PHONE_REGEX.fullmatch(telefone_limpo):
         raise HTTPException(
             status_code=400,
             detail="Telefone inválido. Use o formato (00) 00000-0000",
         )
 
+    # 2. Prepara o número para a API (Tira os parênteses e traços)
+    numero_para_api = "".join(filter(str.isdigit, telefone_limpo))
+    
+    # Adiciona o DDI do Brasil (55) se não tiver, pois APIs exigem formato internacional
+    if not numero_para_api.startswith("55"):
+        numero_para_api = "55" + numero_para_api
+
+    # 3. Chamada para a API Externa
+
+    API_KEY = os.getenv("PHONE_API_KEY")
+    url = f"https://phonevalidation.abstractapi.com/v1/?api_key={API_KEY}&phone={numero_para_api}"
+
+    try:
+        print(f"Chamando API com a chave: {API_KEY[:5]}***")
+        response = requests.get(url, timeout=5)
+        
+        print(f"STATUS DA API: {response.status_code}")
+        print(f"RESPOSTA DA API: {response.text}")
+        
+        if response.status_code == 200:
+            dados = response.json()
+            # Verifica se a API explicitamente disse que é falso
+            if dados.get("valid") is False:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Este número de telefone não existe nas operadoras reais."
+                )
+        else:
+            print("A API não retornou sucesso (200). Usando o Plano B.")
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Aviso: API de telefone indisponível. Motivo: {e}")
+        pass
 
 def get_current_user_id(authorization: str = Header(default=None)) -> int:
     if not authorization or not authorization.startswith("Bearer "):
@@ -311,6 +357,27 @@ async def cadastrar_usuario(usuario: CadastroUsuario, db: Session = Depends(get_
     db.add(novo_usuario)
     db.commit()
     return {"message": "Usuário cadastrado com sucesso"}
+
+@app.delete("/usuarios/{user_id}")
+async def deletar_usuario(user_id: int, db: Session = Depends(get_db)):
+    
+    usuario = db.query(Usuario).filter(Usuario.ID == user_id).first()
+    
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario não encontrado")
+    
+    try:
+        
+        db.query(PostSalvo).filter(PostSalvo.usuario_id == user_id).delete()
+        db.query(PostUsuario).filter(PostUsuario.usuario_id == user_id).delete()
+        
+        db.delete(usuario)
+        db.commit()
+        return {"message": "Conta excluída com sucesso"}
+    except Exception as e:
+        db.rollback()
+        print(f"Erro ao eliminar: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
 
 # --- 6. ROTAS DE PERFIL E BUSCA ---
 
