@@ -75,3 +75,9 @@ loginForm.addEventListener("submit", async (event) => {
     alert("Erro no servidor. Verifique se o Uvicorn esta rodando.");
   }
 });
+
+// const token = localStorage.getItem("token");
+
+// if (!token) {
+//   window.location.href = `${APP_BASE_URL}/public/Login/login.html`;
+// }
